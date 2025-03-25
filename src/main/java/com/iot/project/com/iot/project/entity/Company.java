@@ -1,6 +1,7 @@
 package com.iot.project.com.iot.project.entity;
 
 import java.util.Set;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -26,7 +27,7 @@ public class Company{
     String name;
 
     @Column(name = "api_key")
-    String apiKey;
+    UUID apiKey;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy="company")
     Set<Location> locations;
