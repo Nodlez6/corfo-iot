@@ -23,7 +23,7 @@ public class LocationService {
     }
 
     public Location createLocation(Location location, Company company) {
-        //location.setCompany(company);
+        location.setCompany(company);
         //return locationRepository.save(location);
         return null;
     }

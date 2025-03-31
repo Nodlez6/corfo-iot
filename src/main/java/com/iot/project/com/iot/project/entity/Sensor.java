@@ -1,6 +1,7 @@
 package com.iot.project.com.iot.project.entity;
 
 import java.util.Date;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -37,14 +38,6 @@ public class Sensor {
     String locationMeta;
 
     @Column(name = "api_key")
-    String apiKey;
-    
-    
-//    @Column(name = "location_id")
-//    Long locationId;
-
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name="location_id")
-//    Location location;
+    UUID apiKey;
 
 }
