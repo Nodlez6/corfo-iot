@@ -1,0 +1,7 @@
+package com.iot.project.com.iot.project.exception;
+
+public class UnauthorizedException extends RuntimeException{
+    public UnauthorizedException(String message) {
+        super(message);
+    }
+}
