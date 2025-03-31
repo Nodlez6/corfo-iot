@@ -18,6 +18,5 @@ public class Admin {
     Long id;
 
     String username;
-
     String password;
 }

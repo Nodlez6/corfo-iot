@@ -1,0 +1,1 @@
+insert into admin(username, password)values('admin', 'admin') ON CONFLICT (username) DO NOTHING;
