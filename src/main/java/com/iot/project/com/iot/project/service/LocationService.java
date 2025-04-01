@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.BAD_REQUEST_LOCATION_SERVICE;
+import static com.iot.project.com.iot.project.exception.ConstantsExceptions.ENTITY_NOT_FOUND_BY_COMPANY;
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.RESOURCE_NOT_FOUND;
 
 @Service
@@ -51,19 +52,22 @@ public class LocationService {
             return locationRepository.save(location);
         }
 
-    public Location updateLocation(Long id, UpdateLocationRequest request, Long companyId) {
-        Location existingLocation = locationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
+        public Location updateLocation(Long id, UpdateLocationRequest request, Long companyId) {
+            Location existingLocation = locationRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
 
-        existingLocation.setLocationName(request.getLocationName());
-        existingLocation.setLocationAddress(request.getLocationAddress());
-        existingLocation.setLocationCountry(request.getLocationCountry());
-        existingLocation.setLocationCity(request.getLocationCity());
-        existingLocation.setLocationMeta(request.getLocationMeta());
-        existingLocation.setCompanyId(companyId);
+            if (!existingLocation.getCompanyId().equals(companyId)){
+                throw new NotFoundException("Location " + ENTITY_NOT_FOUND_BY_COMPANY);
+            }
+            existingLocation.setLocationName(request.getLocationName());
+            existingLocation.setLocationAddress(request.getLocationAddress());
+            existingLocation.setLocationCountry(request.getLocationCountry());
+            existingLocation.setLocationCity(request.getLocationCity());
+            existingLocation.setLocationMeta(request.getLocationMeta());
+            existingLocation.setCompanyId(companyId);
 
-        return locationRepository.save(existingLocation);
-    }
+            return locationRepository.save(existingLocation);
+        }
 
 
         public void deleteLocation(Long id, Long companyId) {
