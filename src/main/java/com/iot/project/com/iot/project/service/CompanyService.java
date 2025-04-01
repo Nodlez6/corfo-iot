@@ -37,21 +37,38 @@ public class CompanyService {
         }
 
         Company newCompany = Company.builder()
-                .name(companyName)
-                .apiKey(apiKey)
+                .companyName(companyName)
+                .companyApiKey(apiKey)
                 .build();
 
         return companyRepository.save(newCompany);
     }
 
     public Company getCompanyByApiKey(UUID apiKey) {
-        return companyRepository.findByApiKey(apiKey)
+        return companyRepository.findByCompanyApiKey(apiKey)
                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
     }
 
-    public boolean existsThisApiKey(UUID apiKey) {
-        return companyRepository.findByApiKey(apiKey).isPresent();
+    public Company updateCompany(Long id, String companyName, UUID apiKey, Admin admin) {
+        Company existing = companyRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
+
+        adminService.authenticateAdmin(admin.getUsername(), admin.getPassword());
+
+        existing.setCompanyName(companyName);
+        existing.setCompanyApiKey(apiKey);
+
+        return companyRepository.save(existing);
     }
 
+    public boolean existsThisApiKey(UUID apiKey) {
+        return companyRepository.findByCompanyApiKey(apiKey).isPresent();
+    }
+
+    public void deleteCompanyById(Long id) {
+        Company company = companyRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
+        companyRepository.delete(company);
+    }
 
 }

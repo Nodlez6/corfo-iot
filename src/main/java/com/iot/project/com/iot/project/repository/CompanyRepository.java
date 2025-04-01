@@ -20,8 +20,8 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
-	Optional<Company> findByApiKey(UUID apiIKey);
-	List<Company> findByName(String _name);
+	Optional<Company> findByCompanyApiKey(UUID apiIKey);
+	List<Company> findByCompanyName(String _name);
 }
 
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -26,7 +27,10 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
         String requestUri = request.getRequestURI();
-        if (!requestUri.startsWith("/afsdfadsafsd")) {
+        List<String> securedPaths = List.of("/api/locations", "/api/sensors");
+        boolean shouldFilter = securedPaths.stream()
+                .anyMatch(requestUri::startsWith);
+        if (!shouldFilter) {
             filterChain.doFilter(request, response);
             return;
         }

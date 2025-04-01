@@ -31,14 +31,16 @@ import lombok.NoArgsConstructor;
 public class Company{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    @Column(name = "company_id")
+    private Long companyId;
 
-    String name;
+    @Column(name = "company_name")
+    private String companyName;
 
-    @Column(name = "api_key")
-    UUID apiKey;
+    @Column(name = "company_api_key")
+    private UUID companyApiKey;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name="company_id", nullable=false)
-    Set<Location> locations;
+    @JoinColumn(name = "company_id", referencedColumnName = "company_id", nullable = false, insertable = false, updatable = false)
+    private Set<Location> locations;
 }

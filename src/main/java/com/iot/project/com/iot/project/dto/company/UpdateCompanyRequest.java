@@ -1,4 +1,4 @@
-package com.iot.project.com.iot.project.dto;
+package com.iot.project.com.iot.project.dto.company;
 
 import java.util.UUID;
 
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class CreateCompanyRequest {
+public class UpdateCompanyRequest {
     @NotBlank
     private String companyName;
     @NotNull

@@ -8,6 +8,7 @@ public class ConstantsExceptions {
     public static final String UNAUTHORIZED_ACCESS = "Unauthorized access. You do not have permission to access this resource.";
     public static final String SERVER_ERROR = "An internal server error occurred. Please try again later.";
     public static final String BAD_REQUEST = "Bad request. Please verify your input data.";
+    public static final String BAD_REQUEST_LOCATION_SERVICE = "Bad request. Please verify your input data. The provided company API key does not match the location.";
     public static final String DATA_NOT_FOUND = "The requested data could not be found.";
     public static final String DUPLICATE_ENTRY = "Duplicate entry detected. The record already exists.";
 }

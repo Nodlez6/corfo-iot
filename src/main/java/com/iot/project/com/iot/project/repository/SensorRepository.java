@@ -14,7 +14,7 @@ import com.iot.project.com.iot.project.entity.Sensor;
 
 @Repository
 public interface SensorRepository extends JpaRepository<Sensor, Long> {
-	Sensor findByApiKey(UUID apiKey);
+	Sensor findBySensorApiKey(UUID apiKey);
 }
 
 
