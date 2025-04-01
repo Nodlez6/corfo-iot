@@ -1,7 +1,6 @@
 package com.iot.project.com.iot.project.service;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.iot.project.com.iot.project.dto.location.CreateLocationRequest;
 import com.iot.project.com.iot.project.dto.location.UpdateLocationRequest;
@@ -13,7 +12,6 @@ import com.iot.project.com.iot.project.repository.CompanyRepository;
 import com.iot.project.com.iot.project.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.BAD_REQUEST_LOCATION_SERVICE;
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.RESOURCE_NOT_FOUND;
@@ -25,41 +23,36 @@ public class LocationService {
         private final LocationRepository locationRepository;
         private final CompanyRepository companyRepository;
 
-        public List<Location> getAllLocations() {
-            return locationRepository.findAll();
+        public List<Location> getAllLocations(Long companyId) {
+            Company company = companyRepository.findByCompanyId(companyId)
+                    .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
+            return locationRepository.findAllByCompanyId(company.getCompanyId());
         }
 
-        public Location getLocationById(Long id, UUID company_api_key) {
+        public Location getLocationById(Long id, Long companyId) {
             Location location = locationRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-            Company company = companyRepository.findByCompanyApiKey(company_api_key)
-                    .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
 
-            if( !location.getCompanyId().equals(company.getCompanyId()) ){
+            if( !location.getCompanyId().equals(companyId) ){
                 throw new BadRequestException(BAD_REQUEST_LOCATION_SERVICE);
             }
             return location;
         }
 
-        public Location createLocation(CreateLocationRequest request, UUID company_api_key) {
-            Company company = companyRepository.findByCompanyApiKey(company_api_key)
-                    .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
+        public Location createLocation(CreateLocationRequest request, Long companyId) {
             Location location = Location.builder()
                     .locationName(request.getLocationName())
                     .locationAddress(request.getLocationAddress())
                     .locationCountry(request.getLocationCountry())
                     .locationCity(request.getLocationCity())
                     .locationMeta(request.getLocationMeta())
-                    .companyId(company.getCompanyId())
+                    .companyId(companyId)
                     .build();
             return locationRepository.save(location);
         }
 
-    public Location updateLocation(Long id, UpdateLocationRequest request, UUID company_api_key ) {
+    public Location updateLocation(Long id, UpdateLocationRequest request, Long companyId) {
         Location existingLocation = locationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-
-        Company company = companyRepository.findByCompanyApiKey(company_api_key)
                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
 
         existingLocation.setLocationName(request.getLocationName());
@@ -67,20 +60,17 @@ public class LocationService {
         existingLocation.setLocationCountry(request.getLocationCountry());
         existingLocation.setLocationCity(request.getLocationCity());
         existingLocation.setLocationMeta(request.getLocationMeta());
-        existingLocation.setCompanyId(company.getCompanyId());
+        existingLocation.setCompanyId(companyId);
 
         return locationRepository.save(existingLocation);
     }
 
 
-        public void deleteLocation(Long id, UUID company_api_key) {
+        public void deleteLocation(Long id, Long companyId) {
             Location location = locationRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
 
-            Company company = companyRepository.findByCompanyApiKey(company_api_key)
-                    .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-
-            if( !location.getCompanyId().equals(company.getCompanyId()) ){
+            if( !location.getCompanyId().equals(companyId) ){
                 throw new BadRequestException(BAD_REQUEST_LOCATION_SERVICE);
             }
             locationRepository.delete(location);

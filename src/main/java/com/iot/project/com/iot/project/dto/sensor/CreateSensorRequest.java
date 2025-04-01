@@ -7,9 +7,10 @@ import lombok.Getter;
 public class CreateSensorRequest {
     @NotBlank
     private String sensorName;
-
     @NotBlank
     private String sensorCategory;
-
+    @NotBlank
     private String sensorMeta;
+    @NotBlank
+    private Long locationId;
 }

@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,7 +46,17 @@ public class Sensor {
     @Column(name = "sensor_api_key")
     private UUID sensorApiKey;
 
+    @Column(name = "location_id", nullable = false, updatable = false)
+    private Long locationId;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "sensor_id", referencedColumnName = "sensor_id", nullable = false, insertable = false, updatable = false)
     private Set<SensorData> sensorData;
+
+    @PrePersist
+    public void prePersist() {
+        if (sensorApiKey == null) {
+            sensorApiKey = UUID.randomUUID();
+        }
+    }
 }

@@ -54,6 +54,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         try {
             Company company = companyService.getCompanyByApiKey(apiKey);
             request.setAttribute("authenticatedCompany", company);
+            request.setAttribute("authenticatedCompanyId", company.getCompanyId());
             filterChain.doFilter(request, response);
         } catch (NotFoundException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,

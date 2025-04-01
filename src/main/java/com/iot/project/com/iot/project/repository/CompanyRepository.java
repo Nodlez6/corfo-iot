@@ -21,6 +21,7 @@ import jakarta.transaction.Transactional;
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
 	Optional<Company> findByCompanyApiKey(UUID apiIKey);
+	Optional<Company> findByCompanyId(Long id);
 	List<Company> findByCompanyName(String _name);
 }
 

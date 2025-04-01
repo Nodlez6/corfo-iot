@@ -54,6 +54,6 @@ public class Location {
     private Long companyId;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "location_id", nullable = false)
+    @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false, insertable = false, updatable = false)
     private Set<Sensor> sensors;
 }
