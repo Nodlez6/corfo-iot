@@ -10,6 +10,8 @@ import com.iot.project.com.iot.project.entity.Admin;
 import com.iot.project.com.iot.project.entity.Company;
 import com.iot.project.com.iot.project.service.CompanyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -57,7 +59,7 @@ public class CompanyController {
                 request.getApiKey(),
                 admin
         );
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @DeleteMapping("/{id}")

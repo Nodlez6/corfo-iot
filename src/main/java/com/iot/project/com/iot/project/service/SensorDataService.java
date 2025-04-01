@@ -3,6 +3,7 @@ package com.iot.project.com.iot.project.service;
 import java.time.Instant;
 import java.util.List;
 
+import com.iot.project.com.iot.project.dto.sensorData.GetSensorDataRequest;
 import com.iot.project.com.iot.project.entity.SensorData;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class SensorDataService {
         return null;
     }
 
-    public List<SensorData> getSensorData(Instant from, Instant to, List<Long> sensorIds) {
+    public List<SensorData> getAllSensorData(GetSensorDataRequest request, Long companyId) {
         // return List<SensorData> sensorDataList = sensorDataRepository.findByTimestampBetweenAndSensorIdIn(from, to, sensorIds);
         return null;
     }

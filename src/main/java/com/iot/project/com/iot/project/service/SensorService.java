@@ -23,47 +23,32 @@ public class SensorService {
     private final LocationRepository locationRepository;
 
     public List<Sensor> getAllSensors(Long companyId) {
-        List<Location> locations = locationRepository.findAllByCompanyId(companyId);
-        List<Long> locationIds = locations.stream().map(Location::getLocationId).toList();
-        return sensorRepository.findAllByLocationIdIn(locationIds);
+        return sensorRepository.findAllByCompanyId(companyId);
     }
 
-    public Sensor getSensorById(Long id, Long companyId) {
-        Sensor sensor = sensorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-        List<Location> locations = locationRepository.findAllByCompanyId(companyId);
-        boolean anyMatch = locations.stream().anyMatch(location -> location.getLocationId().equals(sensor.getLocationId()));
-        if (!anyMatch) {
-            throw new NotFoundException("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY);
-        }
-        return sensor;
+    public Sensor getSensorById(Long sensorId, Long companyId) {
+        return sensorRepository.findBySensorIdAndCompanyId(sensorId, companyId)
+                .orElseThrow(() -> new NotFoundException("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY));
     }
 
     public Sensor createSensor(CreateSensorRequest request, Long companyId) {
-        List<Location> locations = locationRepository.findAllByCompanyId(companyId);
-        boolean anyMatch = locations.stream().anyMatch(location -> location.getLocationId().equals(request.getLocationId()));
-        if (!anyMatch) {
-            throw new NotFoundException("Location id " + ENTITY_NOT_FOUND_BY_COMPANY);
-        }
+        Location location = locationRepository.findByLocationIdAndCompanyId(request.getLocationId(), companyId)
+                .orElseThrow(() -> new NotFoundException("Location id " + ENTITY_NOT_FOUND_BY_COMPANY));
+
         Sensor sensor = Sensor.builder()
                 .sensorName(request.getSensorName())
                 .sensorCategory(request.getSensorCategory())
                 .sensorMeta(request.getSensorMeta())
-                .locationId(request.getLocationId())
+                .locationId(location.getLocationId())
                 .build();
         return sensorRepository.save(sensor);
     }
 
     public Sensor updateSensor(Long id, UpdateSensorRequest request, Long companyId) {
-        List<Location> locations = locationRepository.findAllByCompanyId(companyId);
-        List<Long> locationIds = locations.stream().map(Location::getLocationId).toList();
-        Sensor sensor = sensorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
+        Sensor sensor = sensorRepository.findBySensorIdAndLocationIdAndCompanyId(
+                        id, request.getLocationId(), companyId)
+                .orElseThrow(() -> new NotFoundException("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY));
 
-        if (!locationIds.contains(sensor.getLocationId())){
-            throw new NotFoundException("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY);
-        }
-        sensor.setLocationId(request.getLocationId());
         sensor.setSensorApiKey(request.getSensorApiKey());
         sensor.setSensorCategory(request.getSensorCategory());
         sensor.setSensorName(request.getSensorName());
@@ -72,14 +57,9 @@ public class SensorService {
         return sensorRepository.save(sensor);
     }
 
-    public void deleteSensor(Long id, Long companyId) {
-        List<Location> locations = locationRepository.findAllByCompanyId(companyId);
-        List<Long> locationIds = locations.stream().map(Location::getLocationId).toList();
-        Sensor sensor = sensorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-        if (!locationIds.contains(sensor.getLocationId())){
-            throw new NotFoundException("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY);
-        }
+    public void deleteSensor(Long sensorId, Long companyId) {
+        Sensor sensor = sensorRepository.findBySensorIdAndCompanyId(sensorId, companyId)
+                .orElseThrow(() -> new NotFoundException("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY));
         sensorRepository.delete(sensor);
     }
 }

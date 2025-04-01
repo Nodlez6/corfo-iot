@@ -8,6 +8,7 @@ import com.iot.project.com.iot.project.entity.Sensor;
 import com.iot.project.com.iot.project.service.SensorService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,7 +47,7 @@ public class SensorController {
                                                HttpServletRequest httpRequest) {
         Long companyId =  (Long) httpRequest.getAttribute("authenticatedCompanyId");
         Sensor created = sensorService.createSensor(request, companyId);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")

@@ -25,9 +25,7 @@ public class LocationService {
         private final CompanyRepository companyRepository;
 
         public List<Location> getAllLocations(Long companyId) {
-            Company company = companyRepository.findByCompanyId(companyId)
-                    .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-            return locationRepository.findAllByCompanyId(company.getCompanyId());
+            return locationRepository.findAllByCompanyId(companyId);
         }
 
         public Location getLocationById(Long id, Long companyId) {
