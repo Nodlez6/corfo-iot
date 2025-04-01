@@ -1,18 +1,20 @@
 package com.iot.project.com.iot.project.filter;
 
 import com.iot.project.com.iot.project.entity.Company;
-import com.iot.project.com.iot.project.exception.UnauthorizedException;
+import com.iot.project.com.iot.project.exception.NotFoundException; // o tu excepción personalizada
 import com.iot.project.com.iot.project.service.CompanyService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import org.springframework.web.filter.OncePerRequestFilter;
-import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-@AllArgsConstructor
+import java.io.IOException;
+import java.util.UUID;
+
+@RequiredArgsConstructor
 @Component
 public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
@@ -21,21 +23,37 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-        String apiKey = request.getHeader("X-API-KEY");
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+        String requestUri = request.getRequestURI();
+        if (!requestUri.startsWith("/afsdfadsafsd")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        String apiKeyHeader = request.getHeader("X-API-KEY");
 
-        if (apiKey == null || apiKey.isEmpty()) {
-            throw new UnauthorizedException("Unauthorized: Missing API Key");
+        if (apiKeyHeader == null || apiKeyHeader.isBlank()) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Unauthorized: Missing API Key");
+            return;
         }
 
-        Company company = companyService.getCompanyByApiKey(apiKey);
-        if (company == null) {
-            throw new UnauthorizedException("Unauthorized: Invalid company-api-key");
+        UUID apiKey;
+        try {
+            apiKey = UUID.fromString(apiKeyHeader);
+        } catch (IllegalArgumentException e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Unauthorized: Invalid API Key format");
+            return;
         }
 
-        // Con esto se me ocurre cuando alguna accion necesitemos el company que validamos, pasarlo desde el controaldor
-        request.setAttribute("authenticatedCompany", company);
-
-        filterChain.doFilter(request, response);
+        try {
+            Company company = companyService.getCompanyByApiKey(apiKey);
+            request.setAttribute("authenticatedCompany", company);
+            filterChain.doFilter(request, response);
+        } catch (NotFoundException e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Unauthorized: Invalid API Key");
+        }
     }
 }

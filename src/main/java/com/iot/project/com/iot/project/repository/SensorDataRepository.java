@@ -13,7 +13,7 @@ import com.iot.project.com.iot.project.entity.SensorData;
 
 @Repository
 public interface SensorDataRepository extends JpaRepository<SensorData, Long> {
-	Sensor findBySensorId(Long sensorId);
+	SensorData findBySensorId(Long sensorId);
 }
 
 
