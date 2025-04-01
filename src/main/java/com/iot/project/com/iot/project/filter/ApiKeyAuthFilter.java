@@ -38,7 +38,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
         if (apiKeyHeader == null || apiKeyHeader.isBlank()) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                    "Unauthorized: Missing API Key");
+                    "Unauthorized: Missing API Key (X-API-KEY)");
             return;
         }
 

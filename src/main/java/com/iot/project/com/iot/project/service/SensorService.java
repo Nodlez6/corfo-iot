@@ -2,23 +2,17 @@ package com.iot.project.com.iot.project.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import com.iot.project.com.iot.project.dto.sensor.CreateSensorRequest;
-import com.iot.project.com.iot.project.entity.Company;
 import com.iot.project.com.iot.project.entity.Location;
 import com.iot.project.com.iot.project.entity.Sensor;
 import com.iot.project.com.iot.project.exception.NotFoundException;
-import com.iot.project.com.iot.project.exception.UnauthorizedException;
-import com.iot.project.com.iot.project.repository.CompanyRepository;
 import com.iot.project.com.iot.project.repository.LocationRepository;
 import com.iot.project.com.iot.project.repository.SensorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.ENTITY_NOT_FOUND_BY_COMPANY;
-import static com.iot.project.com.iot.project.exception.ConstantsExceptions.INVALID_CREDENTIALS;
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.RESOURCE_NOT_FOUND;
 
 @Service
@@ -64,6 +58,16 @@ public class SensorService {
 //    }
 
     public void deleteSensor(Long id, Long companyId) {
+        List<Location> locations = locationRepository.findAllByCompanyId(companyId);
+        List<Long> locationIds = locations.stream().map(Location::getLocationId).toList();
+        List<Sensor> sensors = sensorRepository.findAllByLocationIdIn(locationIds);
+        Optional<Sensor> sensorOpt = sensors.stream().filter(sensor -> sensor.getSensorId().equals(id)).findFirst();
+
+        if (sensorOpt.isPresent()) {
+            sensorRepository.delete(sensorOpt.get());
+        } else {
+            throw new NotFoundException("Sensor with id " + id + ENTITY_NOT_FOUND_BY_COMPANY);
+        }
 
     }
 }
