@@ -32,7 +32,7 @@ public class CompanyService {
 
     public Company createCompany(String companyName, UUID apiKey, Admin admin) {
         adminService.authenticateAdmin(admin.getUsername(), admin.getPassword());
-        if( this.existsThisApiKey(apiKey) ){
+        if( this.existsCompanyApiKey(apiKey) ){
             throw new ApiKeyAlreadyExistsException(API_KEY_ALREADY_EXISTS);
         }
 
@@ -61,7 +61,7 @@ public class CompanyService {
         return companyRepository.save(existing);
     }
 
-    public boolean existsThisApiKey(UUID apiKey) {
+    public boolean existsCompanyApiKey(UUID apiKey) {
         return companyRepository.findByCompanyApiKey(apiKey).isPresent();
     }
 

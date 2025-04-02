@@ -51,7 +51,7 @@ public class Sensor {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "sensor_id", referencedColumnName = "sensor_id", nullable = false, insertable = false, updatable = false)
-    private Set<SensorData> sensorData;
+    private Set<SensorDataHeader> sensorData;
 
     @PrePersist
     public void prePersist() {

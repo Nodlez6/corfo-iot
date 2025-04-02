@@ -4,7 +4,7 @@ public class ConstantsExceptions {
     public static final String RESOURCE_NOT_FOUND = "Resource not found.";
     public static final String INVALID_CREDENTIALS = "Invalid credentials.";
     public static final String ENTITY_NOT_FOUND_BY_COMPANY = "not found for authenticated company";
-    public static final String INVALID_API_KEY = "Invalid API key.";
+    public static final String INVALID_SENSOR_API_KEY = "No sensor exists with the provided API key.";
     public static final String API_KEY_ALREADY_EXISTS = "API key already exists.";
     public static final String UNAUTHORIZED_ACCESS = "Unauthorized access. You do not have permission to access this resource.";
     public static final String SERVER_ERROR = "An internal server error occurred. Please try again later.";

@@ -2,6 +2,7 @@ package com.iot.project.com.iot.project.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.iot.project.com.iot.project.dto.sensor.CreateSensorRequest;
 import com.iot.project.com.iot.project.dto.sensor.UpdateSensorRequest;
@@ -61,5 +62,9 @@ public class SensorService {
         Sensor sensor = sensorRepository.findBySensorIdAndCompanyId(sensorId, companyId)
                 .orElseThrow(() -> new NotFoundException("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY));
         sensorRepository.delete(sensor);
+    }
+
+    public Optional<Sensor> getSensorBySensorApiKey(UUID apiKey) {
+        return sensorRepository.findBySensorApiKey(apiKey);
     }
 }

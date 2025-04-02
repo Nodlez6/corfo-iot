@@ -1,10 +1,12 @@
-package com.iot.project.com.iot.project.dto.sensorData;
+package com.iot.project.com.iot.project.dto.sensorDataHeader;
 
 import java.time.Instant;
 import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
+@Getter
 public class GetSensorDataRequest {
     @NotNull
     private Instant from;
