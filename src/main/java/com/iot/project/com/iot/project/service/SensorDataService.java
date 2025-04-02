@@ -1,12 +1,12 @@
 package com.iot.project.com.iot.project.service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.iot.project.com.iot.project.dto.sensorDataHeader.CreateSensorDataRequest;
+import com.iot.project.com.iot.project.dto.sensorData.CreateSensorDataRequest;
+import com.iot.project.com.iot.project.dto.sensorData.GetSensorDataRequest;
 import com.iot.project.com.iot.project.entity.Sensor;
 import com.iot.project.com.iot.project.entity.SensorDataDetail;
 import com.iot.project.com.iot.project.entity.SensorDataHeader;
@@ -15,7 +15,6 @@ import com.iot.project.com.iot.project.exception.NotFoundException;
 import com.iot.project.com.iot.project.repository.SensorDataDetailRepository;
 import com.iot.project.com.iot.project.repository.SensorDataHeaderRepository;
 import com.iot.project.com.iot.project.repository.SensorMetricRepository;
-import com.iot.project.com.iot.project.repository.SensorRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,20 +25,12 @@ import static com.iot.project.com.iot.project.exception.ConstantsExceptions.RESO
 public class SensorDataService {
     private final SensorDataHeaderRepository sensorDataHeaderRepository;
     private final SensorService sensorService;
-    private final SensorRepository sensorRepository;
-    private final SensorMetricRepository sensorMetricRepository;
     private final SensorDataDetailRepository sensorDataDetailRepository;
+    private final SensorMetricRepository sensorMetricRepository;
 
-    public String saveSensorData(){
-        //long sensorId = sensorService.authenticateSensorApiKey( aqui iria el api key);
-        //construir un objeto SensorData con la data y el id obtenido de la auth
-        //sensorDataRepository.save( )
-        return null;
+    public List<SensorDataHeader> getAllSensorData(GetSensorDataRequest request, Long companyId) {
+        return sensorDataHeaderRepository.findBySensorIdsAndDateRangeAndCompanyApiKey(companyId, request.getSensorIds(), request.getFrom(), request.getTo());
     }
-
-//    public List<SensorData> getAllSensorData(GetSensorDataRequest request, Long companyId) {
-//        return sensorDataRepository.findSensorDataBySensorIdsAndTimestampBetweenAndCompanyId(request.getSensorIds(), request.getTo(), request.getFrom(), companyId);
-//    }
 
     public SensorDataHeader createSensorData(CreateSensorDataRequest request) {
         Sensor sensor = sensorService.getSensorBySensorApiKey(request.getApiKey())

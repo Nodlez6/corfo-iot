@@ -1,4 +1,4 @@
-package com.iot.project.com.iot.project.dto.sensorDataHeader;
+package com.iot.project.com.iot.project.dto.sensorData;
 
 import java.time.Instant;
 import java.util.List;

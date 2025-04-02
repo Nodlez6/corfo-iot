@@ -2,6 +2,7 @@ package com.iot.project.com.iot.project.entity;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +20,10 @@ public class SensorDataDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sensor_data_detail_id")
+    @JsonIgnore
     private Long id;
 
+    @JsonIgnore
     @Column(name = "sensor_data_header_id", nullable = false, updatable = false)
     private Long sensorDataHeaderId;
 

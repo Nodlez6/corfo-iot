@@ -1,5 +1,6 @@
 package com.iot.project.com.iot.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ public class SensorMetric {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sensor_metric_id")
+    @JsonIgnore
     private Long id;
 
     @Column(name = "metric_name", nullable = false, unique = true)

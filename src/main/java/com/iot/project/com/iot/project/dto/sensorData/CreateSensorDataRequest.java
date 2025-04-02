@@ -1,4 +1,4 @@
-package com.iot.project.com.iot.project.dto.sensorDataHeader;
+package com.iot.project.com.iot.project.dto.sensorData;
 
 import java.util.List;
 import java.util.UUID;

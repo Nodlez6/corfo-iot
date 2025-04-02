@@ -28,11 +28,11 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String requestUri = request.getRequestURI();
         String method = request.getMethod();
-        if (requestUri.startsWith("/api/sensors") && method.equalsIgnoreCase("POST")) {
+        if (requestUri.startsWith("/api/sensorData") && method.equalsIgnoreCase("POST")) {
             filterChain.doFilter(request, response);
             return;
         }
-        List<String> securedPaths = List.of("/api/locations", "/api/sensors");
+        List<String> securedPaths = List.of("/api/locations", "/api/sensors", "/api/sensorData");
         boolean shouldFilter = securedPaths.stream()
                 .anyMatch(requestUri::startsWith);
         if (!shouldFilter) {
