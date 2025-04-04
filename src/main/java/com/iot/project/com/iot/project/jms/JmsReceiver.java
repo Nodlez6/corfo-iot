@@ -16,9 +16,11 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot.project.com.iot.project.service.SensorDataService;
 
@@ -43,9 +45,10 @@ public class JmsReceiver  {
 		if(jmsMessage instanceof TextMessage)
 		{
 			try {
-				MyRecievedData recievedData = this.mapper.readValue(((TextMessage) jmsMessage).getText(), MyRecievedData.class);
-				recievedData.setDate(SDF.format(new Date()));
-				this.sensorDataService.handleMessage(recievedData);
+				MyRecievedData _recievedData = this.mapper.readValue(((TextMessage) jmsMessage).getText(), MyRecievedData.class);
+				_recievedData.setDate(SDF.format(new Date()));
+				_recievedData.setJsonDataAsString(this.mapper.writeValueAsString(_recievedData.getJson_data()));
+				this.sensorDataService.handleMessage(_recievedData);
 			}catch (Exception e) {
 				logger.error("Can´t parse message", e);
 			} 
@@ -61,18 +64,19 @@ public class JmsReceiver  {
 	@NoArgsConstructor
 	private static class MyRecievedData{
 		String api_key;
-		List<SensorJsonData> json_data;
+		JsonNode  json_data;
+		String    jsonDataAsString;
 		String date;
-		
-		@JsonIgnoreProperties(ignoreUnknown = true)
-		@Data
-		@AllArgsConstructor
-		@NoArgsConstructor
-		private static class SensorJsonData{
-			Integer datetime;
-			Double temp;
-			Double humidity;
-		}		
+//		List<SensorJsonData> json_data;		
+//		@JsonIgnoreProperties(ignoreUnknown = true)
+//		@Data
+//		@AllArgsConstructor
+//		@NoArgsConstructor
+//		private static class SensorJsonData{
+//			Integer datetime;
+//			Double temp;
+//			Double humidity;
+//		}		
 	}
 	
 }
