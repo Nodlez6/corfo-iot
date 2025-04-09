@@ -13,7 +13,7 @@ import lombok.ToString;
 @Getter
 public class SensorDataReadingDTO {
     @JsonProperty("datetime")
-    private Instant datetime;
+    private String datetime;
 
     private Map<String, Double> metrics = new HashMap<>();
 

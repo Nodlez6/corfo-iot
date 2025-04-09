@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
-@RequestMapping("/api/companies")
+@RequestMapping("/api/v1/company")
 @RequiredArgsConstructor
 public class CompanyController {
     private final CompanyService companyService;

@@ -18,7 +18,7 @@ import com.iot.project.com.iot.project.repository.SensorMetricRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.iot.project.com.iot.project.exception.ConstantsExceptions.RESOURCE_NOT_FOUND;
+import static com.iot.project.com.iot.project.exception.ConstantsExceptions.INVALID_SENSOR_API_KEY;
 
 @Service
 @AllArgsConstructor
@@ -34,7 +34,7 @@ public class SensorDataService {
 
     public SensorDataHeader createSensorData(CreateSensorDataRequest request) {
         Sensor sensor = sensorService.getSensorBySensorApiKey(request.getApiKey())
-                .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(INVALID_SENSOR_API_KEY));
 
         Set<SensorDataDetail> sensorDataDetailList = new HashSet<>();
 
@@ -45,7 +45,7 @@ public class SensorDataService {
         SensorDataHeader sensorDataHeaderResponse = sensorDataHeaderRepository.save(sensorDataHeader);
 
         request.getJsonData().forEach(reading -> {
-            Instant readingTimestamp = reading.getDatetime();
+            Instant readingTimestamp = Instant.parse(reading.getDatetime());
 
             reading.getMetrics().forEach((metricName, metricValue) -> {
                 SensorMetric sensorMetric = sensorMetricRepository.findByMetricName(metricName)
