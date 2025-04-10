@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.iot.project.com.iot.project.dto.sensorData.CreateSensorDataRequest;
 import com.iot.project.com.iot.project.dto.sensorData.GetSensorDataRequest;
@@ -68,5 +69,11 @@ public class SensorDataService {
         sensorDataDetailRepository.saveAll(sensorDataDetailList);
         sensorDataHeader.setDetails(sensorDataDetailList);
         return sensorDataHeader;
+    }
+
+    public void deleteSensorData(Long sensorDataId, UUID sensorApiKey) {
+        sensorService.getSensorBySensorApiKey(sensorApiKey)
+                .orElseThrow(() -> new NotFoundException(INVALID_SENSOR_API_KEY));
+        sensorDataHeaderRepository.deleteById(sensorDataId);
     }
 }

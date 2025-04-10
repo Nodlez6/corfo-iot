@@ -29,15 +29,10 @@ public class CompanyService {
                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
     }
 
-    public Company createCompany(String companyName, UUID apiKey, Admin admin) {
+    public Company createCompany(String companyName, Admin admin) {
         adminService.authenticateAdmin(admin.getUsername(), admin.getPassword());
-        if( this.existsCompanyApiKey(apiKey) ){
-            throw new ApiKeyAlreadyExistsException(API_KEY_ALREADY_EXISTS);
-        }
-
         Company newCompany = Company.builder()
                 .companyName(companyName)
-                .companyApiKey(apiKey)
                 .build();
 
         return companyRepository.save(newCompany);
