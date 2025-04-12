@@ -4,14 +4,16 @@ import java.time.Instant;
 import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class GetSensorDataRequest {
     @NotNull
-    private Instant from;
+    private String from;
     @NotNull
-    private Instant to;
+    private String to;
     @NotNull
     private List<Long> sensorIds;
 }
