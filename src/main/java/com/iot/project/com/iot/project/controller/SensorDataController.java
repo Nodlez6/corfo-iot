@@ -27,8 +27,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class SensorDataController {
     private final SensorDataService sensorDataService;
+
     @GetMapping
-    public ResponseEntity<List<SensorDataHeader>> getSensorData(@RequestBody @Validated GetSensorDataRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<List<SensorDataHeader>> getSensorData(HttpServletRequest httpRequest) {
+        Long companyId =  (Long) httpRequest.getAttribute("authenticatedCompanyId");
+        List<SensorDataHeader> sensorDataList = sensorDataService.getAllSensorData(companyId);
+        return ResponseEntity.ok(sensorDataList);
+    }
+
+
+    @GetMapping("/byDate")
+    public ResponseEntity<List<SensorDataHeader>> getSensorDataByDate(@RequestBody @Validated GetSensorDataRequest request, HttpServletRequest httpRequest) {
         Long companyId =  (Long) httpRequest.getAttribute("authenticatedCompanyId");
         List<SensorDataHeader> sensorDataList = sensorDataService.getAllSensorData(request, companyId);
         return ResponseEntity.ok(sensorDataList);

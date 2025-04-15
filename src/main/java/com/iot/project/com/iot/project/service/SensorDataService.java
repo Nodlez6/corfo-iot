@@ -32,6 +32,10 @@ public class SensorDataService {
     private final SensorDataDetailRepository sensorDataDetailRepository;
     private final SensorMetricRepository sensorMetricRepository;
 
+    public List<SensorDataHeader> getAllSensorData(Long companyId) {
+        return sensorDataHeaderRepository.findAllByCompanyId(companyId);
+    }
+
     public List<SensorDataHeader> getAllSensorData(GetSensorDataRequest request, Long companyId) {
         Instant from = Instant.ofEpochSecond(Long.parseLong(request.getFrom()));
         Instant to = Instant.ofEpochSecond(Long.parseLong(request.getTo()));

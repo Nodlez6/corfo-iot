@@ -17,10 +17,14 @@ public class SensorDataReadingDTO {
     @JsonProperty("datetime")
     private String datetime;
 
-    private Map<String, Double> metrics = new HashMap<>();
+    private Map<String, Double> metrics;
 
     @JsonAnySetter
     public void setMetric(String key, Object value) {
+        if( metrics == null ){
+            metrics = new HashMap<>();
+        }
+
         if (!"datetime".equals(key)) {
             metrics.put(key, Double.valueOf(value.toString()));
         }
