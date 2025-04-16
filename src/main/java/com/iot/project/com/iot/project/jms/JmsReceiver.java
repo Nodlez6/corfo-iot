@@ -1,4 +1,4 @@
-package com.iot.project.com.iot.project.jms;
+/*package com.iot.project.com.iot.project.jms;
 
 import com.iot.project.com.iot.project.dto.sensorData.CreateSensorDataRequest;
 import com.iot.project.com.iot.project.entity.SensorDataHeader;
@@ -42,4 +42,4 @@ public class JmsReceiver  {
 		
 	}
 
-}
+}*/
