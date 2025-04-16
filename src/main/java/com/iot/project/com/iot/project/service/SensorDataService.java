@@ -19,6 +19,7 @@ import com.iot.project.com.iot.project.repository.SensorDataHeaderRepository;
 import com.iot.project.com.iot.project.repository.SensorMetricRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.ENTITY_NOT_FOUND_BY_COMPANY;
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.INVALID_SENSOR_API_KEY;
@@ -41,7 +42,7 @@ public class SensorDataService {
         Instant to = Instant.ofEpochSecond(Long.parseLong(request.getTo()));
         return sensorDataHeaderRepository.findBySensorIdsAndDateRangeAndCompanyApiKey(companyId, request.getSensorIds(), from, to);
     }
-
+    @Transactional
     public SensorDataHeader createSensorData(CreateSensorDataRequest request) {
         Sensor sensor = sensorService.getSensorBySensorApiKey(request.getApiKey())
                 .orElseThrow(() -> new NotFoundException(INVALID_SENSOR_API_KEY));
