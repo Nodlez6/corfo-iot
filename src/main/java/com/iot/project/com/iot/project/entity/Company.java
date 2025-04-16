@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,4 +44,13 @@ public class Company{
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "company_id", referencedColumnName = "company_id", nullable = false, insertable = false, updatable = false)
     private Set<Location> locations;
+
+    @PrePersist
+    public void prePersist() {
+        if (companyApiKey == null) {
+            companyApiKey = UUID.randomUUID();
+        }
+    }
 }
+
+

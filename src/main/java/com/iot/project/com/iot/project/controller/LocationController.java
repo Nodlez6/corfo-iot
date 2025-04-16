@@ -46,6 +46,7 @@ public class LocationController {
     public ResponseEntity<Location> createLocation(@RequestBody @Validated CreateLocationRequest request,
                                                    HttpServletRequest httpRequest) {
         Long companyId =  (Long) httpRequest.getAttribute("authenticatedCompanyId");
+        System.out.println("companyId = " + companyId);
         Location created = locationService.createLocation(request, companyId);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

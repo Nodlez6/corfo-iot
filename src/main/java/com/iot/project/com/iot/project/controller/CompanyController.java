@@ -55,7 +55,6 @@ public class CompanyController {
                 .build();
         Company created = companyService.createCompany(
                 request.getCompanyName(),
-                request.getApiKey(),
                 admin
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(created);

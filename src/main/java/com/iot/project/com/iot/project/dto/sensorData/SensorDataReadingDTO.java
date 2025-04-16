@@ -6,19 +6,25 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 @ToString
 @Getter
+@Builder
 public class SensorDataReadingDTO {
     @JsonProperty("datetime")
     private String datetime;
 
-    private Map<String, Double> metrics = new HashMap<>();
+    private Map<String, Double> metrics;
 
     @JsonAnySetter
     public void setMetric(String key, Object value) {
+        if( metrics == null ){
+            metrics = new HashMap<>();
+        }
+
         if (!"datetime".equals(key)) {
             metrics.put(key, Double.valueOf(value.toString()));
         }

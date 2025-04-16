@@ -31,6 +31,17 @@ public interface SensorDataHeaderRepository extends JpaRepository<SensorDataHead
             @Param("from") Instant from,
             @Param("to") Instant to
     );
+
+    @Query("""
+       SELECT DISTINCT h
+       FROM SensorDataHeader h
+       JOIN Sensor s ON s.sensorId = h.sensorId
+       JOIN Location l ON l.locationId = s.locationId
+       LEFT JOIN FETCH h.details d
+       LEFT JOIN FETCH d.metric m
+       WHERE l.companyId = :companyId
+        """)
+    List<SensorDataHeader> findAllByCompanyId(@Param("companyId") Long companyId);
 }
 
 
