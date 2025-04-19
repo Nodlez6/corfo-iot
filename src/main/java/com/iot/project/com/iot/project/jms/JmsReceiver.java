@@ -24,7 +24,7 @@ public class JmsReceiver  {
 	protected final Log logger = LogFactory.getLog(getClass().getName());
 	ObjectMapper mapper = new ObjectMapper();
 	@Autowired SensorDataService sensorDataService;
-	@JmsListener( containerFactory = "jmsTopicContainerFactory", destination = "${mq.destination:HOLAMUNDO}")
+	@JmsListener( containerFactory = "jmsTopicContainerFactory", destination = "tf-mining-01")
 	public void onMessage(Message jmsMessage) {
 		if(jmsMessage instanceof TextMessage)
 		{
