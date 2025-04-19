@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.iot.project.com.iot.project.exception.ConstantsExceptions.SENSORDATA_ID_NOT_FOUND;
+
 
 @Service
 @AllArgsConstructor
@@ -157,39 +159,51 @@ public class SensorDataService {
         return headerIds.size();
     }
 
+    public SensorDataHeader updateSensorData(Long sensorDataId, CreateSensorDataRequest request, Long companyId) {
+        SensorDataHeader existingHeader = sensorDataHeaderRepository.findById(sensorDataId)
+                .orElseThrow(() -> new NotFoundException(SENSORDATA_ID_NOT_FOUND));
+
+        sensorService.getSensorById(existingHeader.getSensorId(), companyId);
+
+        existingHeader.getDetails().clear();
+        sensorDataHeaderRepository.save(existingHeader);
+        Set<SensorDataDetail> newDetails = new HashSet<>();
+
+        request.getJsonData().forEach(reading -> {
+            Instant readingTimestamp = Instant.ofEpochSecond(Long.parseLong(reading.getDatetime()));
+            reading.getMetrics().forEach((metricName, metricValue) -> {
+                String valueAsString = String.valueOf(metricValue);
+
+                SensorMetric sensorMetric = sensorMetricRepository.findByMetricName(metricName)
+                        .orElseGet(() -> sensorMetricRepository.save(
+                                SensorMetric.builder().metricName(metricName).build()
+                        ));
+                SensorDataDetail detail = SensorDataDetail.builder()
+                        .sensorDataHeaderId(existingHeader.getId())
+                        .metric(sensorMetric)
+                        .value(valueAsString)
+                        .timestamp(readingTimestamp)
+                        .build();
+                newDetails.add(detail);
+            });
+        });
+
+        sensorDataDetailRepository.saveAll(newDetails);
+        existingHeader.setDetails(newDetails);
+        return sensorDataHeaderRepository.save(existingHeader);
+    }
+
+    @Transactional
+    public SensorDataHeader deleteSensorDataById(Long sensorDataId, Long companyId){
+        SensorDataHeader existingHeader = sensorDataHeaderRepository.findById(sensorDataId)
+                .orElseThrow(() -> new NotFoundException(SENSORDATA_ID_NOT_FOUND));
+
+        sensorService.getSensorById(existingHeader.getSensorId(), companyId);
+
+        sensorDataDetailRepository.deleteBySensorDataHeaderId(sensorDataId);
+        sensorDataHeaderRepository.deleteBySensorDataHeaderId(sensorDataId);
+
+        return existingHeader;
+    }
+
 }
-
-
-
-//     public SensorDataHeader updateSensorData(Long sensorDataId, CreateSensorDataRequest request, Long companyId) {
-//         SensorDataHeader existingHeader = sensorDataHeaderRepository.findById(sensorDataId)
-//                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-//
-//         sensorService.getSensorById(existingHeader.getSensorId(), companyId);
-//
-//         sensorDataDetailRepository.deleteAll(existingHeader.getDetails());
-//         Set<SensorDataDetail> newDetails = new HashSet<>();
-//
-//         request.getJsonData().forEach(reading -> {
-//             Instant readingTimestamp = Instant.ofEpochSecond(Long.parseLong(reading.getDatetime()));
-//             reading.getMetrics().forEach((metricName, metricValue) -> {
-//                 String valueAsString = String.valueOf(metricValue);
-//
-//                 SensorMetric sensorMetric = sensorMetricRepository.findByMetricName(metricName)
-//                         .orElseGet(() -> sensorMetricRepository.save(
-//                                 SensorMetric.builder().metricName(metricName).build()
-//                         ));
-//                 SensorDataDetail detail = SensorDataDetail.builder()
-//                         .sensorDataHeaderId(existingHeader.getId())
-//                         .metric(sensorMetric)
-//                         .value(valueAsString)
-//                         .timestamp(readingTimestamp)
-//                         .build();
-//                 newDetails.add(detail);
-//             });
-//         });
-//
-//         sensorDataDetailRepository.saveAll(newDetails);
-//         existingHeader.setDetails(newDetails);
-//         return sensorDataHeaderRepository.save(existingHeader);
-//     }

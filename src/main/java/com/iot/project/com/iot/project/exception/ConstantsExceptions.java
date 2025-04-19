@@ -19,6 +19,11 @@ public class ConstantsExceptions {
     public static final String LOCATION_ID_NOT_FOUND_BY_COMPANY = "Location id not found for authenticated company";
     public static final String SENSOR_APIKEY_NOT_FOUND = "Sensor with the given 'apiKey' was not found.";
 
+    //SENSORDATA
+    public static final String SENSORDATA_ID_NOT_FOUND= "SensorData  with the given 'id' was not found.";
+    public static final String SENSORDATA_NOT_FOUND_BY_COMPANY = "SensorData not found for authenticated company";
+
+
     
     public static final String ERROR = "error";
     public static final String BLANK_USER_PASS = "Field 'user' and 'password' must not be blank";
