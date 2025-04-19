@@ -30,7 +30,6 @@ public class JmsReceiver  {
 	@Autowired SensorDataService sensorDataService;
 	@JmsListener( containerFactory = "jmsTopicContainerFactory", destination = "tf-minera-01")
 	public void onMessage(Message jmsMessage) {
-		System.out.println("sdfsd");
 		try {
 			if (jmsMessage instanceof TextMessage textMessage) {
 				CreateSensorDataRequest receivedData = mapper.readValue(textMessage.getText(), CreateSensorDataRequest.class);

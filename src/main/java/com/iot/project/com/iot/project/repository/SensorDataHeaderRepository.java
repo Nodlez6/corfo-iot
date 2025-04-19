@@ -23,7 +23,7 @@ public interface SensorDataHeaderRepository extends JpaRepository<SensorDataHead
        JOIN Location l ON l.locationId = s.locationId
        WHERE l.companyId = :companyId
        AND s.sensorId IN :sensorIds
-       AND d.timestamp BETWEEN :from AND :to
+       AND h.timestamp BETWEEN :from AND :to
         """)
     List<SensorDataHeader> findBySensorIdsAndDateRangeAndCompanyApiKey(
             @Param("companyId") Long companyId,
