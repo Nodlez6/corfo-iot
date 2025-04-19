@@ -8,8 +8,5 @@ public enum ActionMethod {
     SENSOR,
     SENSORS,
     SENSOR_DATA,
-
-
-
     ERROR,
 }

@@ -3,8 +3,19 @@ package com.iot.project.com.iot.project.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.iot.project.com.iot.project.config.AppProperties;
-import com.iot.project.com.iot.project.dto.location.LocationResponseDto;
 import com.iot.project.com.iot.project.dto.sensorData.CreateSensorDataRequest;
 import com.iot.project.com.iot.project.dto.sensorData.GetSensorDataRequest;
 import com.iot.project.com.iot.project.dto.sensorData.SensorDataDetailDTO;
@@ -24,18 +35,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -111,6 +110,7 @@ public class SensorDataController {
                             .collect(Collectors.toList());
 
                     return SensorDataHeaderResponse.builder()
+                            .sensorDataHeaderId(header.getId())
                             .sensorId(header.getSensorId())
                             .timestamp(header.getTimestamp())
                             .details(details)
@@ -143,6 +143,7 @@ public class SensorDataController {
                             .collect(Collectors.toList());
 
                     return SensorDataHeaderResponse.builder()
+                            .sensorDataHeaderId(header.getId())
                             .sensorId(header.getSensorId())
                             .timestamp(header.getTimestamp())
                             .details(details)
@@ -172,6 +173,7 @@ public class SensorDataController {
                 .collect(Collectors.toList());
 
         SensorDataHeaderResponse responseDTO = SensorDataHeaderResponse.builder()
+                .sensorDataHeaderId(created.getId())
                 .sensorId(created.getSensorId())
                 .timestamp(created.getTimestamp())
                 .details(detailDTOs)
@@ -200,15 +202,15 @@ public class SensorDataController {
             @ApiResponse(responseCode = "200", description = "Sensor data updated successfully"),
             @ApiResponse(responseCode = "404", description = "Sensor data not found")
     })
-    @PutMapping("/{sensorDataId}")
+    @PutMapping("/{sensorDataHeaderId}")
     public ResponseEntity<ServiceResponse<SensorDataResponseDto>>
     updateSensorData(
-            @PathVariable Long sensorDataId,
+            @PathVariable Long sensorDataHeaderId,
             @RequestBody @Validated CreateSensorDataRequest request,
             HttpServletRequest httpRequest) {
 
         Long companyId = (Long) httpRequest.getAttribute("authenticatedCompanyId");
-        SensorDataHeader updated = sensorDataService.updateSensorData(sensorDataId,
+        SensorDataHeader updated = sensorDataService.updateSensorData(sensorDataHeaderId,
                 request, companyId);
 
         List<SensorDataDetailDTO> detailDTOs = updated.getDetails().stream()
@@ -220,6 +222,7 @@ public class SensorDataController {
                 .collect(Collectors.toList());
 
         SensorDataHeaderResponse responseDTO = SensorDataHeaderResponse.builder()
+                .sensorDataHeaderId(updated.getId())
                 .sensorId(updated.getSensorId())
                 .timestamp(updated.getTimestamp())
                 .details(detailDTOs)
@@ -229,17 +232,17 @@ public class SensorDataController {
         return ResponseEntity.ok(new ServiceResponse<>(APP_NAME, ActionMethod.SENSOR_DATA, responseDto));
     }
 
-    @Operation(summary = "Cancel (delete) sensor data by ID", description = "Cancels a specific sensor data entry by marking it for deletion or removing it directly.", responses = {
+    @Operation(summary = "Delete sensor data by ID", description = "Cancels a specific sensor data entry by marking it for deletion or removing it directly.", responses = {
             @ApiResponse(responseCode = "200", description = "Sensor data cancelled successfully"),
             @ApiResponse(responseCode = "404", description = "Sensor data not found")
     })
-    @DeleteMapping("/{sensorDataId}")
+    @DeleteMapping("/{sensorDataHeaderId}")
     public ResponseEntity<ServiceResponse<SensorDataResponseDto>> cancelSensorData(
-            @PathVariable Long sensorDataId,
+            @PathVariable Long sensorDataHeaderId,
             HttpServletRequest httpRequest) {
 
         Long companyId = (Long) httpRequest.getAttribute("authenticatedCompanyId");
-        SensorDataHeader deleted = sensorDataService.deleteSensorDataById(sensorDataId, companyId);
+        SensorDataHeader deleted = sensorDataService.deleteSensorDataById(sensorDataHeaderId, companyId);
 
         List<SensorDataDetailDTO> detailDTOs = deleted.getDetails().stream()
                 .map(detail -> SensorDataDetailDTO.builder()
@@ -250,6 +253,7 @@ public class SensorDataController {
                 .collect(Collectors.toList());
 
         SensorDataHeaderResponse responseDTO = SensorDataHeaderResponse.builder()
+                .sensorDataHeaderId(deleted.getId())
                 .sensorId(deleted.getSensorId())
                 .timestamp(deleted.getTimestamp())
                 .details(detailDTOs)

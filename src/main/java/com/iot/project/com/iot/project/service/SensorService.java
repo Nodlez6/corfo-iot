@@ -27,11 +27,6 @@ public class SensorService {
 
 
 
-    // public List<Sensor> getAllSensors(Long companyId) {
-    //     return sensorRepository.findAllByCompanyId(companyId);
-    // }
-
-
     public List<Sensor> getAllSensors(Long companyId) {
         return sensorRepository.findAllByCompanyIdOrderBySensorIdAsc(companyId);
     }

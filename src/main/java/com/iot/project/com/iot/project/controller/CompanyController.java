@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SecurityRequirement(name = "ApiKeyAuth") //Esto hace que Swagger use el header Authorization
+@SecurityRequirement(name = "ApiKeyAuth") //Permite que Swagger use el header Authorization
 @RestController
 @Validated
 @RequestMapping("/api/v1/company")
