@@ -62,7 +62,6 @@ public class SensorService {
         sensor.setSensorName(request.getSensorName() != null ? request.getSensorName() : sensor.getSensorName());
         sensor.setSensorCategory(request.getSensorCategory() != null ? request.getSensorCategory() : sensor.getSensorCategory());
         sensor.setSensorMeta(request.getSensorMeta() != null ? request.getSensorMeta() : sensor.getSensorMeta());
-        // sensor.setLocationId(request.getLocationId() != null ? request.getLocationId() : sensor.getLocationId());
         sensor.setSensorApiKey(request.getSensorApiKey() != null ? request.getSensorApiKey() : sensor.getSensorApiKey());
 
         return sensorRepository.save(sensor);

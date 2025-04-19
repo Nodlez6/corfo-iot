@@ -23,9 +23,6 @@ public class LocationService {
 
         private final LocationRepository locationRepository;
 
-
-
-
         public List<Location> getAllLocations(Long companyId) {
             return locationRepository.findAllByCompanyIdOrderByLocationIdAsc(companyId);
         }

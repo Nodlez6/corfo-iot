@@ -28,10 +28,6 @@ public class SensorDataReadingDTO {
         }
 
         if (!"datetime".equals(key)) {
-            // metrics.put(key, Double.valueOf(value.toString()));
-            // metrics.put(key, value.toString());
-            // String valueToStore;
-
             try {
                 metrics.put(key, Double.valueOf(value.toString()));
             } catch (Exception e) {

@@ -42,14 +42,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Sensors", description = "Operations related to sensor management")
 public class SensorController {
 
-    // Required dependency injections
     private final SensorService sensorService;
     private final AppProperties appProperties;
 
-    // Variable to store the application name (retrieved from AppProperties)
     private String APP_NAME;
 
-    // Method executed after bean construction to initialize APP_NAME
     @PostConstruct
     public void init() {
         this.APP_NAME = appProperties.getResponseKey();
@@ -88,9 +85,7 @@ public class SensorController {
     })
     @GetMapping("/apikey/{apiKey}")
     public ResponseEntity<ServiceResponse<SensorResponseDto>> getSensorByApiKey(
-            @Parameter(description = "Sensor API key") @PathVariable("apiKey") UUID apiKey,
-            HttpServletRequest httpRequest) {
-        // Long companyId = (Long) httpRequest.getAttribute("authenticatedCompanyId");
+            @Parameter(description = "Sensor API key") @PathVariable("apiKey") UUID apiKey) {
         Sensor sensor = sensorService.getSensorBySensorApiKey(apiKey);
         SensorResponseDto responseDto = new SensorResponseDto(sensor, ActionType.GET_BY_APIKEY);
         return ResponseEntity.ok(new ServiceResponse<>(APP_NAME, ActionMethod.SENSOR, responseDto));

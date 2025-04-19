@@ -44,14 +44,11 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "SensorData", description = "Operations related to sensor data management")
 public class SensorDataController {
 
-    // Required dependency injections
     private final SensorDataService sensorDataService;
     private final AppProperties appProperties;
 
-    // Variable to store the application name (retrieved from AppProperties)
     private String APP_NAME;
 
-    // Method executed after bean construction to initialize APP_NAME
     @PostConstruct
     public void init() {
         this.APP_NAME = appProperties.getResponseKey();

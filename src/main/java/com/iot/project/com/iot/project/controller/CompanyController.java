@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SecurityRequirement(name = "ApiKeyAuth") //Permite que Swagger use el header Authorization
+@SecurityRequirement(name = "ApiKeyAuth")
 @RestController
 @Validated
 @RequestMapping("/api/v1/company")
@@ -44,14 +44,11 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Companies", description = "Operations related to company management")
 public class CompanyController {
 
-    // Required dependency injections
     private final CompanyService companyService;
     private final AppProperties appProperties;
 
-    // Variable to store the application name (retrieved from AppProperties)
     private String APP_NAME;
 
-    // Method executed after bean construction to initialize APP_NAME
     @PostConstruct
     public void init() {
         this.APP_NAME = appProperties.getResponseKey();

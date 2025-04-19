@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 public class CompanyService {
     private final CompanyRepository companyRepository;
 
-
-
     public List<Company> getCompanies(){
         return companyRepository.findAll();
     }
@@ -75,49 +73,3 @@ public class CompanyService {
     }
 
 }
-
-
-    // public List<Company> getCompanies(){
-    //     return companyRepository.findAll();
-    // }
-
-    // public Company getCompanyById(long id) throws NotFoundException {
-    //     return companyRepository.findById(id)
-    //             .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-    // }
-
-    // public Company createCompany(String companyName, Admin admin) {
-    //     adminService.authenticateAdmin(admin.getUsername(), admin.getPassword());
-    //     Company newCompany = Company.builder()
-    //             .companyName(companyName)
-    //             .build();
-
-    //     return companyRepository.save(newCompany);
-    // }
-
-    // public Company getCompanyByApiKey(UUID apiKey) {
-    //     return companyRepository.findByCompanyApiKey(apiKey)
-    //             .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-    // }
-
-    // public Company updateCompany(Long id, String companyName, UUID apiKey, Admin admin) {
-    //     Company existing = companyRepository.findById(id)
-    //             .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-
-    //     adminService.authenticateAdmin(admin.getUsername(), admin.getPassword());
-
-    //     existing.setCompanyName(companyName);
-    //     existing.setCompanyApiKey(apiKey);
-
-    //     return companyRepository.save(existing);
-    // }
-
-    // public boolean existsCompanyApiKey(UUID apiKey) {
-    //     return companyRepository.findByCompanyApiKey(apiKey).isPresent();
-    // }
-
-    // public void deleteCompanyById(Long id) {
-    //     Company company = companyRepository.findById(id)
-    //             .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-    //     companyRepository.delete(company);
-    // }

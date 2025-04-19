@@ -108,25 +108,20 @@ public class SensorDataService {
     public int deleteSensorDataByDateTimeRange(GetSensorDataRequest request, Long companyId) {
         System.out.println("Método deleteSensorDataByDateTimeRange iniciado");
 
-        // Formato de fecha esperado
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-        // Parseo de las fechas
         LocalDateTime fromDateTime = LocalDateTime.parse(request.getFrom(), formatter);
         LocalDateTime toDateTime = LocalDateTime.parse(request.getTo(), formatter);
 
-        // Conversión de las fechas a Instant
         Instant from = fromDateTime.toInstant(ZoneOffset.UTC);
         Instant to = toDateTime.toInstant(ZoneOffset.UTC);
 
         System.out.println("Rango de fechas: de " + from + " a " + to);
 
-        // Verificar qué registros existen en la base de datos para esas fechas
         List<SensorDataHeader> allRecordsInRange = sensorDataHeaderRepository.findAllByTimestampBetween(from, to);
         System.out.println("Registros encontrados en la base de datos entre las fechas: " + allRecordsInRange.size());
         allRecordsInRange.forEach(record -> System.out.println("Registro: " + record.getTimestamp()));
 
-        // Obtener los IDs de las cabeceras que coincidan
         List<Long> headerIds = sensorDataHeaderRepository.findIdsBySensorIdsAndDateRangeAndCompanyApiKey(
                 companyId, request.getSensorIds(), from, to);
         System.out.println("IDs encontrados para eliminación: " + headerIds);
@@ -136,11 +131,9 @@ public class SensorDataService {
             return 0;
         }
 
-        // Eliminar detalles primero (si no tienes cascade)
         sensorDataDetailRepository.deleteBySensorDataHeaderIdIn(headerIds);
         System.out.println("Detalles eliminados.");
 
-        // Eliminar cabeceras
         sensorDataHeaderRepository.deleteByIdIn(headerIds);
         System.out.println("Cabeceras eliminadas.");
 
