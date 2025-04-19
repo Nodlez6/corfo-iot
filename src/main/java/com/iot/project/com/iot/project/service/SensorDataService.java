@@ -160,35 +160,35 @@ public class SensorDataService {
 
 
 
-    // public SensorDataHeader updateSensorData(Long sensorDataId, CreateSensorDataRequest request, Long companyId) {
-    //     SensorDataHeader existingHeader = sensorDataHeaderRepository.findById(sensorDataId)
-    //             .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
-
-    //     sensorService.getSensorById(existingHeader.getSensorId(), companyId);
-
-    //     sensorDataDetailRepository.deleteAll(existingHeader.getDetails());
-    //     Set<SensorDataDetail> newDetails = new HashSet<>();
-
-    //     request.getJsonData().forEach(reading -> {
-    //         Instant readingTimestamp = Instant.ofEpochSecond(Long.parseLong(reading.getDatetime()));
-    //         reading.getMetrics().forEach((metricName, metricValue) -> {
-    //             String valueAsString = String.valueOf(metricValue);
-
-    //             SensorMetric sensorMetric = sensorMetricRepository.findByMetricName(metricName)
-    //                     .orElseGet(() -> sensorMetricRepository.save(
-    //                             SensorMetric.builder().metricName(metricName).build()
-    //                     ));
-    //             SensorDataDetail detail = SensorDataDetail.builder()
-    //                     .sensorDataHeaderId(existingHeader.getId())
-    //                     .metric(sensorMetric)
-    //                     .value(valueAsString)
-    //                     .timestamp(readingTimestamp)
-    //                     .build();
-    //             newDetails.add(detail);
-    //         });
-    //     });
-
-    //     sensorDataDetailRepository.saveAll(newDetails);
-    //     existingHeader.setDetails(newDetails);
-    //     return sensorDataHeaderRepository.save(existingHeader);
-    // }
+//     public SensorDataHeader updateSensorData(Long sensorDataId, CreateSensorDataRequest request, Long companyId) {
+//         SensorDataHeader existingHeader = sensorDataHeaderRepository.findById(sensorDataId)
+//                 .orElseThrow(() -> new NotFoundException(RESOURCE_NOT_FOUND));
+//
+//         sensorService.getSensorById(existingHeader.getSensorId(), companyId);
+//
+//         sensorDataDetailRepository.deleteAll(existingHeader.getDetails());
+//         Set<SensorDataDetail> newDetails = new HashSet<>();
+//
+//         request.getJsonData().forEach(reading -> {
+//             Instant readingTimestamp = Instant.ofEpochSecond(Long.parseLong(reading.getDatetime()));
+//             reading.getMetrics().forEach((metricName, metricValue) -> {
+//                 String valueAsString = String.valueOf(metricValue);
+//
+//                 SensorMetric sensorMetric = sensorMetricRepository.findByMetricName(metricName)
+//                         .orElseGet(() -> sensorMetricRepository.save(
+//                                 SensorMetric.builder().metricName(metricName).build()
+//                         ));
+//                 SensorDataDetail detail = SensorDataDetail.builder()
+//                         .sensorDataHeaderId(existingHeader.getId())
+//                         .metric(sensorMetric)
+//                         .value(valueAsString)
+//                         .timestamp(readingTimestamp)
+//                         .build();
+//                 newDetails.add(detail);
+//             });
+//         });
+//
+//         sensorDataDetailRepository.saveAll(newDetails);
+//         existingHeader.setDetails(newDetails);
+//         return sensorDataHeaderRepository.save(existingHeader);
+//     }
