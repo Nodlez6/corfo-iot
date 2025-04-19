@@ -15,13 +15,13 @@ public class SensorDataResponseDto {
     private Instant timestamp;
     private List<SensorDataDetailDTO> details;
 
-    public SensorDataResponseDto(SensorDataHeader header, ActionType actionType) {
+    public SensorDataResponseDto(SensorDataHeaderResponse header, ActionType actionType) {
         this.action = actionType;
         this.sensorId = header.getSensorId();
         this.timestamp = header.getTimestamp();
         this.details = header.getDetails().stream()
                 .map(detail -> SensorDataDetailDTO.builder()
-                        .metricName(detail.getMetric().getMetricName())
+                        .metricName(detail.getMetricName())
                         .value(detail.getValue())
                         .timestamp(detail.getTimestamp())
                         .build())

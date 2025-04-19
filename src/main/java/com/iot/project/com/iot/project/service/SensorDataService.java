@@ -189,7 +189,7 @@ public class SensorDataService {
         });
 
         sensorDataDetailRepository.saveAll(newDetails);
-        existingHeader.setDetails(newDetails);
+        existingHeader.getDetails().addAll(newDetails);
         return sensorDataHeaderRepository.save(existingHeader);
     }
 

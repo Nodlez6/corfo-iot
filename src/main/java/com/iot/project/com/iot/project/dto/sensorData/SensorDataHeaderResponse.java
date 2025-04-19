@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SensorDataHeaderResponse {
     private Long sensorId;
+    private Long sensorDataHeaderId;
     private Instant timestamp;
     private List<SensorDataDetailDTO> details;
 }
