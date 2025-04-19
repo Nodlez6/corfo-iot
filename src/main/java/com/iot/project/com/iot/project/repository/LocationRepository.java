@@ -17,6 +17,7 @@ import com.iot.project.com.iot.project.entity.Location;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Location> findAllByCompanyId(Long id);
+    List<Location> findAllByCompanyIdOrderByLocationIdAsc(Long companyId);
     Optional<Location> findByLocationIdAndCompanyId(Long locationId, Long companyId);
 	//@Query( value = "select l from Location l join Company c on l.companyId = c.id  where c.apiKey = ?1 ")
 	//List<Location> findByCompanyApiKey(String apiKey);

@@ -42,6 +42,34 @@ public interface SensorDataHeaderRepository extends JpaRepository<SensorDataHead
        WHERE l.companyId = :companyId
         """)
     List<SensorDataHeader> findAllByCompanyId(@Param("companyId") Long companyId);
+
+
+
+
+    
+    // Método para encontrar todos los registros dentro de un rango de fechas
+    List<SensorDataHeader> findAllByTimestampBetween(Instant from, Instant to);
+    
+
+
+    @Query("""
+        SELECT DISTINCT h.id
+        FROM SensorDataHeader h
+        JOIN Sensor s ON s.sensorId = h.sensorId
+        JOIN Location l ON l.locationId = s.locationId
+        WHERE l.companyId = :companyId
+        AND s.sensorId IN :sensorIds
+        AND h.timestamp BETWEEN :from AND :to
+    """)
+    List<Long> findIdsBySensorIdsAndDateRangeAndCompanyApiKey(
+            @Param("companyId") Long companyId,
+            @Param("sensorIds") List<Long> sensorIds,
+            @Param("from") Instant from,
+            @Param("to") Instant to
+    );
+    
+    void deleteByIdIn(List<Long> ids);
+    
 }
 
 

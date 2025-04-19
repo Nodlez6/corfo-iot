@@ -1,19 +1,14 @@
 package com.iot.project.com.iot.project.dto.sensorData;
 
-import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @Builder
@@ -23,7 +18,8 @@ public class SensorDataReadingDTO {
     @JsonProperty("datetime")
     private String datetime;
 
-    private Map<String, Double> metrics;
+    @JsonProperty
+    private Map<String, Object> metrics;
 
     @JsonAnySetter
     public void setMetric(String key, Object value) {
@@ -32,7 +28,15 @@ public class SensorDataReadingDTO {
         }
 
         if (!"datetime".equals(key)) {
-            metrics.put(key, Double.valueOf(value.toString()));
+            // metrics.put(key, Double.valueOf(value.toString()));
+            // metrics.put(key, value.toString());
+            // String valueToStore;
+
+            try {
+                metrics.put(key, Double.valueOf(value.toString()));
+            } catch (Exception e) {
+                metrics.put(key, value.toString());
+            }
         }
     }
 }
