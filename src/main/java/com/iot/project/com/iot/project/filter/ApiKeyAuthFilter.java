@@ -62,6 +62,11 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
                         return;
                     }
 
+                    if (requestUri.startsWith("/api/v1/sensorData") && method.equalsIgnoreCase("POST") ) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
+
 
 
                     // Permitir acceso sin autenticación a Swagger y documentación
