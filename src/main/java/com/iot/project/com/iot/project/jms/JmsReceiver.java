@@ -7,14 +7,12 @@ import com.iot.project.com.iot.project.dto.sensorData.CreateSensorDataRequest;
 import com.iot.project.com.iot.project.entity.SensorDataHeader;
 
 import jakarta.jms.BytesMessage;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot.project.com.iot.project.service.SensorDataService;
 

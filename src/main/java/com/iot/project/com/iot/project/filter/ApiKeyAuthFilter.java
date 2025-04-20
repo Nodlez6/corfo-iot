@@ -8,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,6 +18,7 @@ import com.iot.project.com.iot.project.entity.Company;
 import com.iot.project.com.iot.project.exception.UnauthorizedException;
 import com.iot.project.com.iot.project.service.CompanyService;
 
+@Slf4j
 public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
     private final HandlerExceptionResolver exceptionResolver;
@@ -38,8 +40,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             String method = request.getMethod();
             String requestUri = request.getRequestURI();
 
-            System.out.println("Intercepting request: " + requestUri + " | Method: " + method); // Agrega esto para
-                                                                                                // depurar
+            log.info("Intercepting request: " + requestUri + " | Method: " + method);
 
             // Flujo sin seguridad
 
@@ -69,7 +70,6 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             boolean shouldFilter = protectedPaths.stream().anyMatch(requestUri::startsWith);
 
             if (shouldFilter) {
-                System.out.println("MENU - 1");
                 String authorizationHeader = request.getHeader("Authorization");
                 if (authorizationHeader == null || authorizationHeader.isBlank()) {
                     throw new UnauthorizedException("Header 'Authorization' is required.");
@@ -94,10 +94,8 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             request.setAttribute("authenticatedCompany", company);
             request.setAttribute("authenticatedCompanyId", company.getCompanyId());
 
-            System.out.println("MENU - 8");
 
             filterChain.doFilter(request, response);
-            System.out.println("MENU - 9");
 
         } catch (Exception ex) {
             exceptionResolver.resolveException(request, response, null, ex);

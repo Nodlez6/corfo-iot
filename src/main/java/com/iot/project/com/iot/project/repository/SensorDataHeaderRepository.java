@@ -40,6 +40,7 @@ public interface SensorDataHeaderRepository extends JpaRepository<SensorDataHead
        LEFT JOIN FETCH h.details d
        LEFT JOIN FETCH d.metric m
        WHERE l.companyId = :companyId
+       ORDER BY d.id DESC
         """)
     List<SensorDataHeader> findAllByCompanyId(@Param("companyId") Long companyId);
 

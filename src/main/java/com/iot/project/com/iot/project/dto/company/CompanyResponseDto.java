@@ -1,13 +1,11 @@
 package com.iot.project.com.iot.project.dto.company;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.iot.project.com.iot.project.dto.wrapper.ActionType;
-// import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iot.project.com.iot.project.entity.Company;
 import com.iot.project.com.iot.project.entity.Location;
 

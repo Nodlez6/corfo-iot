@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.iot.project.com.iot.project.dto.wrapper.ActionType;
-import com.iot.project.com.iot.project.entity.SensorDataHeader;
 import lombok.Getter;
 
 @Getter

@@ -65,7 +65,7 @@ class SensorServiceTest {
     @Test
     void createSensorSavesAndReturnsEntityWhenLocationExists() {
         Long companyId = 3L;
-        UUID apiKey = UUID.randomUUID();
+        // UUID apiKey = UUID.randomUUID();
         Location loc = Location.builder().locationId(10L).companyId(companyId).build();
         CreateSensorRequest req = CreateSensorRequest.builder()
                 .sensorName("S1")

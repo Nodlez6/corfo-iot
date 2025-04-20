@@ -3,7 +3,6 @@ package com.iot.project.com.iot.project.controller;
 import com.iot.project.com.iot.project.config.AppProperties;
 import com.iot.project.com.iot.project.dto.sensorData.CreateSensorDataRequest;
 import com.iot.project.com.iot.project.dto.sensorData.GetSensorDataRequest;
-import com.iot.project.com.iot.project.dto.sensorData.SensorDataDetailDTO;
 import com.iot.project.com.iot.project.dto.sensorData.SensorDataHeaderResponse;
 import com.iot.project.com.iot.project.dto.sensorData.SensorDataReadingDTO;
 import com.iot.project.com.iot.project.dto.sensorData.SensorDataResponseDto;
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.geo.Metric;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -203,10 +201,10 @@ class SensorDataControllerTest {
         when(sensorDataService.updateSensorData(headerId, req, COMPANY_ID)).thenReturn(updated);
 
         ResponseEntity<ServiceResponse<SensorDataResponseDto>> response = controller.updateSensorData(headerId, req, httpRequest);
-        ServiceResponse<SensorDataResponseDto> body = response.getBody();
+        // ServiceResponse<SensorDataResponseDto> body = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        SensorDataResponseDto dto = body.getResponse().get(APP_NAME).get(ActionMethod.SENSOR_DATA.name());
+        // SensorDataResponseDto dto = body.getResponse().get(APP_NAME).get(ActionMethod.SENSOR_DATA.name());
     }
 
     @Test
@@ -222,9 +220,9 @@ class SensorDataControllerTest {
         when(sensorDataService.deleteSensorDataById(headerId, COMPANY_ID)).thenReturn(deleted);
 
         ResponseEntity<ServiceResponse<SensorDataResponseDto>> response = controller.cancelSensorData(headerId, httpRequest);
-        ServiceResponse<SensorDataResponseDto> body = response.getBody();
+        // ServiceResponse<SensorDataResponseDto> body = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        SensorDataResponseDto dto = body.getResponse().get(APP_NAME).get(ActionMethod.SENSOR_DATA.name());
+        // SensorDataResponseDto dto = body.getResponse().get(APP_NAME).get(ActionMethod.SENSOR_DATA.name());
     }
 }

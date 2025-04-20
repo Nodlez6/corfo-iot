@@ -2,7 +2,6 @@ package com.iot.project.com.iot.project.entity;
 
 import java.time.Instant;
 import java.util.Set;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
