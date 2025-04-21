@@ -1,7 +1,7 @@
 package com.iot.project.com.iot.project.service;
 
-import com.iot.project.com.iot.project.exception.NotFoundException;
 import com.iot.project.com.iot.project.entity.Admin;
+import com.iot.project.com.iot.project.exception.NotFoundException;
 import com.iot.project.com.iot.project.repository.AdminRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,10 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static com.iot.project.com.iot.project.exception.ConstantsExceptions.INVALID_CREDENTIALS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
@@ -26,37 +24,28 @@ class AdminServiceTest {
     @InjectMocks
     private AdminService adminService;
 
+    private final String USERNAME = "adminUser";
+    private final String PASSWORD = "securePass";
 
     @Test
-    void authenticateAdminSuccess() {
-        String username = "admin";
-        String password = "password";
-
-        Admin admin = Admin.builder()
-                .username(username)
-                .password(password)
-                .build();
-
-        when(adminRepository.findByUsernameAndPassword(username, password))
-                .thenReturn(Optional.of(admin));
-
-        adminService.authenticateAdmin(username, password);
-
-        verify(adminRepository).findByUsernameAndPassword(username, password);
+    void authenticateAdminDoesNotThrowWhenCredentialsAreValid() {
+        when(adminRepository.findByUsernameAndPassword(USERNAME, PASSWORD))
+                .thenReturn(Optional.of(mock(Admin.class)));
+        assertDoesNotThrow(() -> adminService.authenticateAdmin(USERNAME, PASSWORD));
+        verify(adminRepository, times(1))
+                .findByUsernameAndPassword(USERNAME, PASSWORD);
     }
 
     @Test
-    void authenticateAdminInvalidCredentialsThrowsNotFoundException() {
-        String username = "admin";
-        String password = "wrongPassword";
-
-        when(adminRepository.findByUsernameAndPassword(username, password))
+    void authenticateAdminThrowsNotFoundExceptionWhenCredentialsAreInvalid() {
+        when(adminRepository.findByUsernameAndPassword(USERNAME, PASSWORD))
                 .thenReturn(Optional.empty());
-
-        NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                adminService.authenticateAdmin(username, password)
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> adminService.authenticateAdmin(USERNAME, PASSWORD)
         );
         assertEquals(INVALID_CREDENTIALS, exception.getMessage());
-        verify(adminRepository).findByUsernameAndPassword(username, password);
+        verify(adminRepository, times(1))
+                .findByUsernameAndPassword(USERNAME, PASSWORD);
     }
 }

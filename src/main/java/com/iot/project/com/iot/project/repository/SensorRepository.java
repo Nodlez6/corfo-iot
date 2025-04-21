@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.iot.project.com.iot.project.entity.Company;
 import com.iot.project.com.iot.project.entity.Sensor;
 
 
@@ -22,14 +21,10 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
 
 	List<Sensor> findAllByLocationIdIn(List<Long> locationIds);
 
-	@Query("""
-	   SELECT s
-	   FROM Sensor s, Location l
-	   WHERE s.locationId = l.locationId
-		 AND s.sensorId = :sensorId
-		 AND l.companyId = :companyId
-	""")
-	Optional<Sensor> findBySensorIdAndCompanyId(@Param("sensorId") Long sensorId, @Param("companyId") Long companyId);
+
+	@Query("SELECT s FROM Sensor s, Location l WHERE s.locationId = l.locationId AND l.companyId = :companyId ORDER BY s.sensorId ASC")
+	List<Sensor> findAllByCompanyIdOrderBySensorIdAsc(@Param("companyId") Long companyId);
+
 
 	@Query("SELECT s FROM Sensor s, Location l WHERE s.locationId = l.locationId AND l.companyId = :companyId")
 	List<Sensor> findAllByCompanyId(@Param("companyId") Long companyId);
@@ -43,6 +38,15 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
 			""")
 	Optional<Sensor> findBySensorIdAndLocationIdAndCompanyId(@Param("sensorId") Long sensorId,
 															 @Param("locationId") Long locationId,
+															 @Param("companyId") Long companyId);
+
+
+	@Query("""
+			SELECT s FROM Sensor s
+			JOIN Location l ON s.locationId = l.locationId
+			WHERE s.sensorId = :sensorId AND l.companyId = :companyId
+			""")
+	Optional<Sensor> findBySensorIdAndCompanyId(@Param("sensorId") Long sensorId,
 															 @Param("companyId") Long companyId);
 }
 

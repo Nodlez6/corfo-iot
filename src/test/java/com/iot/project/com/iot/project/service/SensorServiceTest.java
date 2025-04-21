@@ -13,18 +13,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-import static com.iot.project.com.iot.project.exception.ConstantsExceptions.ENTITY_NOT_FOUND_BY_COMPANY;
+import static com.iot.project.com.iot.project.exception.ConstantsExceptions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SensorServiceTest {
+class SensorServiceTest {
 
     @Mock
     private SensorRepository sensorRepository;
@@ -36,188 +32,150 @@ public class SensorServiceTest {
     private SensorService sensorService;
 
     @Test
-    public void testGetAllSensors() {
+    void getAllSensorsReturnsListFromRepository() {
         Long companyId = 1L;
-        List<Sensor> sensors = Arrays.asList(
-                Sensor.builder().sensorName("sensorName1").locationId(10L).build(),
-                Sensor.builder().sensorName("sensorName2").locationId(10L).build()
+        List<Sensor> sensors = List.of(
+                Sensor.builder().sensorId(1L).build(),
+                Sensor.builder().sensorId(2L).build()
         );
-        when(sensorRepository.findAllByCompanyId(companyId)).thenReturn(sensors);
-
-        List<Sensor> result = sensorService.getAllSensors(companyId);
-
-        assertEquals(2, result.size());
-        verify(sensorRepository).findAllByCompanyId(companyId);
+        when(sensorRepository.findAllByCompanyIdOrderBySensorIdAsc(companyId)).thenReturn(sensors);
+        assertEquals(sensors, sensorService.getAllSensors(companyId));
     }
 
     @Test
-    public void testGetSensorByIdFound() {
-        Long companyId = 1L;
-        Long sensorId = 100L;
-        Sensor sensor = Sensor.builder()
-                .sensorName("sensorName")
-                .sensorCategory("sensorCategory")
-                .sensorMeta("sensorMeta")
-                .locationId(20L)
-                .build();
-        when(sensorRepository.findBySensorIdAndCompanyId(sensorId, companyId))
+    void getSensorByIdReturnsSensorWhenExists() {
+        Long companyId = 2L;
+        Sensor sensor = Sensor.builder().sensorId(5L).build();
+        when(sensorRepository.findBySensorIdAndCompanyId(5L, companyId))
                 .thenReturn(Optional.of(sensor));
-
-        Sensor result = sensorService.getSensorById(sensorId, companyId);
-
-        assertNotNull(result);
-        assertEquals("sensorName", result.getSensorName());
-        verify(sensorRepository).findBySensorIdAndCompanyId(sensorId, companyId);
+        assertEquals(sensor, sensorService.getSensorById(5L, companyId));
     }
 
     @Test
-    public void testGetSensorByIdNotFound() {
-        Long companyId = 1L;
-        Long sensorId = 100L;
-        when(sensorRepository.findBySensorIdAndCompanyId(sensorId, companyId))
+    void getSensorByIdThrowsNotFoundWhenNotExists() {
+        when(sensorRepository.findBySensorIdAndCompanyId(1L, 1L))
                 .thenReturn(Optional.empty());
-
-        NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                sensorService.getSensorById(sensorId, companyId)
+        NotFoundException ex = assertThrows(
+                NotFoundException.class,
+                () -> sensorService.getSensorById(1L, 1L)
         );
-        assertEquals("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY, exception.getMessage());
-        verify(sensorRepository).findBySensorIdAndCompanyId(sensorId, companyId);
+        assertEquals(SENSOR_NOT_FOUND_BY_COMPANY, ex.getMessage());
     }
 
     @Test
-    public void testCreateSensor() {
-        Long companyId = 1L;
-        Long locationId = 10L;
-        CreateSensorRequest request = CreateSensorRequest.builder()
-                .sensorName("sensorName")
-                .sensorCategory("sensorCategory")
-                .sensorMeta("sensorMeta")
-                .locationId(locationId)
+    void createSensorSavesAndReturnsEntityWhenLocationExists() {
+        Long companyId = 3L;
+        // UUID apiKey = UUID.randomUUID();
+        Location loc = Location.builder().locationId(10L).companyId(companyId).build();
+        CreateSensorRequest req = CreateSensorRequest.builder()
+                .sensorName("S1")
+                .sensorCategory("C1")
+                .sensorMeta("M1")
+                .locationId(loc.getLocationId())
                 .build();
-
-        Location location = Location.builder()
-                .locationId(locationId)
+        when(locationRepository.findByLocationIdAndCompanyId(loc.getLocationId(), companyId))
+                .thenReturn(Optional.of(loc));
+        Sensor toSave = Sensor.builder()
+                .sensorName("S1")
+                .sensorCategory("C1")
+                .sensorMeta("M1")
+                .locationId(loc.getLocationId())
                 .build();
-        when(locationRepository.findByLocationIdAndCompanyId(locationId, companyId))
-                .thenReturn(Optional.of(location));
-
-        Sensor sensorToSave = Sensor.builder()
-                .sensorName("sensorName")
-                .sensorCategory("sensorCategory")
-                .sensorMeta("sensorMeta")
-                .locationId(location.getLocationId())
-                .build();
-        when(sensorRepository.save(any(Sensor.class))).thenReturn(sensorToSave);
-
-        Sensor result = sensorService.createSensor(request, companyId);
-
-        assertNotNull(result);
-        assertEquals("sensorName", result.getSensorName());
-        assertEquals(locationId, result.getLocationId());
-        verify(locationRepository).findByLocationIdAndCompanyId(locationId, companyId);
-        verify(sensorRepository).save(any(Sensor.class));
+        when(sensorRepository.save(any(Sensor.class))).thenReturn(toSave);
+        assertEquals(toSave, sensorService.createSensor(req, companyId));
     }
 
     @Test
-    public void testUpdateSensorValid() {
-        Long companyId = 1L;
-        Long sensorId = 100L;
-        Long locationId = 10L;
-        UpdateSensorRequest request = UpdateSensorRequest.builder()
-                .sensorName("updatedSensorName")
-                .sensorCategory("updatedSensorCategory")
-                .sensorMeta("updatedSensorMeta")
-                .sensorApiKey(UUID.randomUUID())
-                .locationId(locationId)
-                .build();
-
-        Sensor existingSensor = Sensor.builder()
-                .sensorName("oldSensorName")
-                .sensorCategory("oldSensorCategory")
-                .sensorMeta("oldSensorMeta")
-                .locationId(locationId)
-                .build();
-        when(sensorRepository.findBySensorIdAndLocationIdAndCompanyId(sensorId, locationId, companyId))
-                .thenReturn(Optional.of(existingSensor));
-        when(sensorRepository.save(existingSensor)).thenReturn(existingSensor);
-
-        Sensor result = sensorService.updateSensor(sensorId, request, companyId);
-
-        assertNotNull(result);
-        assertEquals("updatedSensorName", result.getSensorName());
-        assertEquals("updatedSensorCategory", result.getSensorCategory());
-        assertEquals("updatedSensorMeta", result.getSensorMeta());
-        assertEquals(request.getSensorApiKey(), result.getSensorApiKey());
-        verify(sensorRepository).findBySensorIdAndLocationIdAndCompanyId(sensorId, locationId, companyId);
-        verify(sensorRepository).save(existingSensor);
-    }
-
-    @Test
-    public void testUpdateSensorNotFound() {
-        Long companyId = 1L;
-        Long sensorId = 100L;
-        Long locationId = 10L;
-        UpdateSensorRequest request = UpdateSensorRequest.builder()
-                .sensorName("updatedSensorName")
-                .sensorCategory("updatedSensorCategory")
-                .sensorMeta("updatedSensorMeta")
-                .sensorApiKey(UUID.randomUUID())
-                .locationId(locationId)
-                .build();
-
-        when(sensorRepository.findBySensorIdAndLocationIdAndCompanyId(sensorId, locationId, companyId))
+    void createSensorThrowsNotFoundWhenLocationNotExists() {
+        when(locationRepository.findByLocationIdAndCompanyId(5L, 4L))
                 .thenReturn(Optional.empty());
-
-        NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                sensorService.updateSensor(sensorId, request, companyId)
+        CreateSensorRequest req = CreateSensorRequest.builder()
+                .locationId(5L).build();
+        NotFoundException ex = assertThrows(
+                NotFoundException.class,
+                () -> sensorService.createSensor(req, 4L)
         );
-        assertEquals("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY, exception.getMessage());
-        verify(sensorRepository).findBySensorIdAndLocationIdAndCompanyId(sensorId, locationId, companyId);
+        assertEquals(LOCATION_ID_NOT_FOUND_BY_COMPANY, ex.getMessage());
     }
 
     @Test
-    public void testDeleteSensorValid() {
-        Long companyId = 1L;
-        Long sensorId = 100L;
-        Sensor sensor = Sensor.builder()
-                .sensorName("sensorName")
-                .locationId(20L)
+    void updateSensorReturnsUpdatedWhenExists() {
+        Long companyId = 5L;
+        Sensor existing = Sensor.builder()
+                .sensorId(20L)
+                .sensorName("Old")
+                .sensorCategory("OC")
+                .sensorMeta("OM")
+                .sensorApiKey(UUID.randomUUID())
                 .build();
-        when(sensorRepository.findBySensorIdAndCompanyId(sensorId, companyId))
+        when(sensorRepository.findBySensorIdAndCompanyId(20L, companyId))
+                .thenReturn(Optional.of(existing));
+        UpdateSensorRequest req = UpdateSensorRequest.builder()
+                .sensorName("New")
+                .sensorCategory("NC")
+                .sensorMeta("NM")
+                .sensorApiKey(UUID.randomUUID())
+                .build();
+        when(sensorRepository.save(existing)).thenReturn(existing);
+        Sensor result = sensorService.updateSensor(20L, req, companyId);
+        assertEquals("New", result.getSensorName());
+        assertEquals("NC", result.getSensorCategory());
+        assertEquals("NM", result.getSensorMeta());
+        assertEquals(req.getSensorApiKey(), result.getSensorApiKey());
+    }
+
+    @Test
+    void updateSensorThrowsNotFoundWhenNotExists() {
+        when(sensorRepository.findBySensorIdAndCompanyId(1L, 2L))
+                .thenReturn(Optional.empty());
+        UpdateSensorRequest req = UpdateSensorRequest.builder().build();
+        NotFoundException ex = assertThrows(
+                NotFoundException.class,
+                () -> sensorService.updateSensor(1L, req, 2L)
+        );
+        assertEquals(SENSOR_NOT_FOUND_BY_COMPANY, ex.getMessage());
+    }
+
+    @Test
+    void deleteSensorDeletesAndReturnsEntityWhenExists() {
+        Long companyId = 6L;
+        Sensor sensor = Sensor.builder().sensorId(30L).build();
+        when(sensorRepository.findBySensorIdAndCompanyId(30L, companyId))
                 .thenReturn(Optional.of(sensor));
-
-        assertDoesNotThrow(() -> sensorService.deleteSensor(sensorId, companyId));
-        verify(sensorRepository).findBySensorIdAndCompanyId(sensorId, companyId);
+        Sensor result = sensorService.deleteSensor(30L, companyId);
         verify(sensorRepository).delete(sensor);
+        assertEquals(sensor, result);
     }
 
     @Test
-    public void testDeleteSensorNotFound() {
-        Long companyId = 1L;
-        Long sensorId = 100L;
-        when(sensorRepository.findBySensorIdAndCompanyId(sensorId, companyId))
+    void deleteSensorThrowsNotFoundWhenNotExists() {
+        when(sensorRepository.findBySensorIdAndCompanyId(2L, 3L))
                 .thenReturn(Optional.empty());
-
-        NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                sensorService.deleteSensor(sensorId, companyId)
+        NotFoundException ex = assertThrows(
+                NotFoundException.class,
+                () -> sensorService.deleteSensor(2L, 3L)
         );
-        assertEquals("Sensor " + ENTITY_NOT_FOUND_BY_COMPANY, exception.getMessage());
-        verify(sensorRepository).findBySensorIdAndCompanyId(sensorId, companyId);
+        assertEquals(SENSOR_NOT_FOUND_BY_COMPANY, ex.getMessage());
     }
 
     @Test
-    public void testGetSensorBySensorApiKey() {
-        UUID apiKey = UUID.randomUUID();
-        Sensor sensor = Sensor.builder()
-                .sensorName("sensorName")
-                .sensorApiKey(apiKey)
-                .build();
-        when(sensorRepository.findBySensorApiKey(apiKey)).thenReturn(Optional.of(sensor));
+    void getSensorBySensorApiKeyReturnsSensorWhenExists() {
+        UUID key = UUID.randomUUID();
+        Sensor sensor = Sensor.builder().sensorApiKey(key).build();
+        when(sensorRepository.findBySensorApiKey(key))
+                .thenReturn(Optional.of(sensor));
+        assertEquals(sensor, sensorService.getSensorBySensorApiKey(key));
+    }
 
-        Optional<Sensor> result = sensorService.getSensorBySensorApiKey(apiKey);
-
-        assertTrue(result.isPresent());
-        assertEquals(apiKey, result.get().getSensorApiKey());
-        verify(sensorRepository).findBySensorApiKey(apiKey);
+    @Test
+    void getSensorBySensorApiKeyThrowsNotFoundWhenNotExists() {
+        UUID key = UUID.randomUUID();
+        when(sensorRepository.findBySensorApiKey(key))
+                .thenReturn(Optional.empty());
+        NotFoundException ex = assertThrows(
+                NotFoundException.class,
+                () -> sensorService.getSensorBySensorApiKey(key)
+        );
+        assertEquals(SENSOR_APIKEY_NOT_FOUND, ex.getMessage());
     }
 }

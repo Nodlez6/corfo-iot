@@ -1,7 +1,7 @@
 package com.iot.project.com.iot.project.service;
 
-import com.iot.project.com.iot.project.entity.Admin;
 import com.iot.project.com.iot.project.entity.Company;
+import com.iot.project.com.iot.project.exception.ApiKeyAlreadyExistsException;
 import com.iot.project.com.iot.project.exception.NotFoundException;
 import com.iot.project.com.iot.project.repository.CompanyRepository;
 import org.junit.jupiter.api.Test;
@@ -10,180 +10,151 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.List;
+import java.util.*;
 
-import static com.iot.project.com.iot.project.exception.ConstantsExceptions.RESOURCE_NOT_FOUND;
+import static com.iot.project.com.iot.project.exception.ConstantsExceptions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CompanyServiceTest {
+class CompanyServiceTest {
 
     @Mock
     private CompanyRepository companyRepository;
-
-    @Mock
-    private AdminService adminService;
 
     @InjectMocks
     private CompanyService companyService;
 
     @Test
-    void testGetCompanies() {
-        List<Company> companies = Arrays.asList(
-                Company.builder().companyName("Company A").build(),
-                Company.builder().companyName("Company B").build()
+    void getCompaniesReturnsAllCompanies() {
+        List<Company> list = List.of(
+                Company.builder().companyId(1L).companyName("A").companyApiKey(UUID.randomUUID()).build(),
+                Company.builder().companyId(2L).companyName("B").companyApiKey(UUID.randomUUID()).build()
         );
-        when(companyRepository.findAll()).thenReturn(companies);
-
-        List<Company> result = companyService.getCompanies();
-
-        assertEquals(2, result.size());
-        verify(companyRepository).findAll();
+        when(companyRepository.findAll()).thenReturn(list);
+        assertEquals(list, companyService.getCompanies());
     }
 
     @Test
-    void testGetCompanyByIdFound() {
-        Company company = Company.builder().companyName("Test Company").build();
-        when(companyRepository.findById(1L)).thenReturn(Optional.of(company));
-
-        Company result = companyService.getCompanyById(1L);
-
-        assertNotNull(result);
-        assertEquals("Test Company", result.getCompanyName());
-        verify(companyRepository).findById(1L);
+    void getCompanyByIdReturnsCompanyWhenExists() {
+        Company c = Company.builder().companyId(1L).build();
+        when(companyRepository.findById(1L)).thenReturn(Optional.of(c));
+        assertEquals(c, companyService.getCompanyById(1L));
     }
 
     @Test
-    void testGetCompanyByIdNotFound() {
+    void getCompanyByIdThrowsNotFoundExceptionWhenNotExists() {
         when(companyRepository.findById(1L)).thenReturn(Optional.empty());
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> companyService.getCompanyById(1L));
+        assertEquals(COMPANY_ID_NOT_FOUND, ex.getMessage());
+    }
 
-        NotFoundException thrown = assertThrows(NotFoundException.class, () ->
-                companyService.getCompanyById(1L)
+    @Test
+    void getCompanyByApiKeyReturnsCompanyWhenExists() {
+        UUID key = UUID.randomUUID();
+        Company c = Company.builder().companyApiKey(key).build();
+        when(companyRepository.findByCompanyApiKey(key)).thenReturn(Optional.of(c));
+        assertEquals(c, companyService.getCompanyByApiKey(key));
+    }
+
+    @Test
+    void getCompanyByApiKeyThrowsNotFoundExceptionWhenNotExists() {
+        UUID key = UUID.randomUUID();
+        when(companyRepository.findByCompanyApiKey(key)).thenReturn(Optional.empty());
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> companyService.getCompanyByApiKey(key));
+        assertEquals(COMPANY_APIKEY_NOT_FOUND, ex.getMessage());
+    }
+
+    @Test
+    void createCompanySavesWhenApiKeyNotExists() {
+        UUID key = UUID.randomUUID();
+        Company toSave = Company.builder().companyName("X").companyApiKey(key).build();
+        when(companyRepository.findByCompanyApiKey(key)).thenReturn(Optional.empty());
+        when(companyRepository.save(any())).thenReturn(toSave);
+        assertEquals(toSave, companyService.createCompany("X", key));
+    }
+
+    @Test
+    void createCompanyThrowsWhenApiKeyAlreadyExists() {
+        UUID key = UUID.randomUUID();
+        when(companyRepository.findByCompanyApiKey(key)).thenReturn(Optional.of(mock(Company.class)));
+        ApiKeyAlreadyExistsException ex = assertThrows(
+                ApiKeyAlreadyExistsException.class,
+                () -> companyService.createCompany("X", key)
         );
-
-        assertEquals(RESOURCE_NOT_FOUND, thrown.getMessage());
-        verify(companyRepository).findById(1L);
+        assertEquals(API_KEY_ALREADY_EXISTS, ex.getMessage());
     }
 
     @Test
-    void testCreateCompany() {
-        String companyName = "New Company";
-        String username = "admin";
-        String password = "password";
-
-        Admin admin = Admin.builder()
-                .username(username)
-                .password(password)
-                .build();
-
-        Company savedCompany = Company.builder().companyName(companyName).build();
-        when(companyRepository.save(any(Company.class))).thenReturn(savedCompany);
-
-        Company result = companyService.createCompany(companyName, admin);
-
-        assertNotNull(result);
-        assertEquals(companyName, result.getCompanyName());
-        verify(adminService).authenticateAdmin(username, password);
-        verify(companyRepository).save(any(Company.class));
+    void deleteCompanyByIdReturnsDeletedCompanyWhenExists() {
+        Company c = Company.builder().companyId(1L).build();
+        when(companyRepository.findById(1L)).thenReturn(Optional.of(c));
+        Company deleted = companyService.deleteCompanyById(1L);
+        assertEquals(c, deleted);
+        verify(companyRepository).delete(c);
     }
 
     @Test
-    void testGetCompanyByApiKeyFound() {
-        UUID apiKey = UUID.randomUUID();
-        Company company = Company.builder().companyName("Test Company").build();
-        when(companyRepository.findByCompanyApiKey(apiKey)).thenReturn(Optional.of(company));
-
-        Company result = companyService.getCompanyByApiKey(apiKey);
-
-        assertNotNull(result);
-        verify(companyRepository).findByCompanyApiKey(apiKey);
+    void deleteCompanyByIdThrowsNotFoundExceptionWhenNotExists() {
+        when(companyRepository.findById(1L)).thenReturn(Optional.empty());
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> companyService.deleteCompanyById(1L));
+        assertEquals(COMPANY_ID_NOT_FOUND, ex.getMessage());
     }
 
     @Test
-    void testGetCompanyByApiKeyNotFound() {
-        UUID apiKey = UUID.randomUUID();
-        when(companyRepository.findByCompanyApiKey(apiKey)).thenReturn(Optional.empty());
+    void updateCompanyUpdatesWhenApiKeyUnchanged() {
+        UUID key = UUID.randomUUID();
+        Company existing = Company.builder().companyId(1L).companyName("Old").companyApiKey(key).build();
+        Company updated = Company.builder().companyId(1L).companyName("New").companyApiKey(key).build();
+        when(companyRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(companyRepository.save(existing)).thenReturn(updated);
+        assertEquals(updated, companyService.updateCompany(1L, "New", key));
+    }
 
-        NotFoundException thrown = assertThrows(NotFoundException.class, () ->
-                companyService.getCompanyByApiKey(apiKey)
+    @Test
+    void updateCompanyUpdatesWhenApiKeyChangedAndNotExists() {
+        UUID oldKey = UUID.randomUUID();
+        UUID newKey = UUID.randomUUID();
+        Company existing = Company.builder().companyId(1L).companyName("Old").companyApiKey(oldKey).build();
+        Company updated = Company.builder().companyId(1L).companyName("New").companyApiKey(newKey).build();
+        when(companyRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(companyRepository.findByCompanyApiKey(newKey)).thenReturn(Optional.empty());
+        when(companyRepository.save(existing)).thenReturn(updated);
+        assertEquals(updated, companyService.updateCompany(1L, "New", newKey));
+    }
+
+    @Test
+    void updateCompanyThrowsWhenIdNotFound() {
+        when(companyRepository.findById(1L)).thenReturn(Optional.empty());
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> companyService.updateCompany(1L, "N", UUID.randomUUID()));
+        assertEquals(COMPANY_ID_NOT_FOUND, ex.getMessage());
+    }
+
+    @Test
+    void updateCompanyThrowsWhenApiKeyAlreadyExists() {
+        UUID oldKey = UUID.randomUUID();
+        UUID newKey = UUID.randomUUID();
+        Company existing = Company.builder().companyId(1L).companyApiKey(oldKey).build();
+        when(companyRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(companyRepository.findByCompanyApiKey(newKey)).thenReturn(Optional.of(mock(Company.class)));
+        ApiKeyAlreadyExistsException ex = assertThrows(
+                ApiKeyAlreadyExistsException.class,
+                () -> companyService.updateCompany(1L, "N", newKey)
         );
-
-        assertEquals(RESOURCE_NOT_FOUND, thrown.getMessage());
-        verify(companyRepository).findByCompanyApiKey(apiKey);
+        assertEquals(API_KEY_ALREADY_EXISTS, ex.getMessage());
     }
 
     @Test
-    void testUpdateCompany() {
-        Long id = 1L;
-        String newCompanyName = "Updated Company";
-        UUID newApiKey = UUID.randomUUID();
-        String username = "admin";
-        String password = "password";
-
-        Admin admin = Admin.builder().username(username).password(password).build();
-        Company existingCompany = Company.builder().companyName("Old Company").build();
-
-        when(companyRepository.findById(id)).thenReturn(Optional.of(existingCompany));
-        when(companyRepository.save(any(Company.class))).thenReturn(existingCompany);
-
-        Company result = companyService.updateCompany(id, newCompanyName, newApiKey, admin);
-
-        assertNotNull(result);
-        assertEquals(newCompanyName, result.getCompanyName());
-        verify(adminService).authenticateAdmin(username, password);
-        verify(companyRepository).findById(id);
-        verify(companyRepository).save(existingCompany);
+    void existsCompanyApiKeyReturnsTrueWhenExists() {
+        UUID key = UUID.randomUUID();
+        when(companyRepository.findByCompanyApiKey(key)).thenReturn(Optional.of(mock(Company.class)));
+        assertTrue(companyService.existsCompanyApiKey(key));
     }
 
     @Test
-    void testExistsCompanyApiKeyTrue() {
-        UUID apiKey = UUID.randomUUID();
-        when(companyRepository.findByCompanyApiKey(apiKey))
-                .thenReturn(Optional.of(Company.builder().companyName("Test Company").build()));
-
-        boolean exists = companyService.existsCompanyApiKey(apiKey);
-
-        assertTrue(exists);
-        verify(companyRepository).findByCompanyApiKey(apiKey);
-    }
-
-    @Test
-    void testExistsCompanyApiKey_False() {
-        UUID apiKey = UUID.randomUUID();
-        when(companyRepository.findByCompanyApiKey(apiKey))
-                .thenReturn(Optional.empty());
-
-        boolean exists = companyService.existsCompanyApiKey(apiKey);
-
-        assertFalse(exists);
-        verify(companyRepository).findByCompanyApiKey(apiKey);
-    }
-
-    @Test
-    void testDeleteCompanyById_Success() {
-        Long id = 1L;
-        Company company = Company.builder().companyName("Company to delete").build();
-        when(companyRepository.findById(id)).thenReturn(Optional.of(company));
-
-        companyService.deleteCompanyById(id);
-        verify(companyRepository).findById(id);
-        verify(companyRepository).delete(company);
-    }
-
-    @Test
-    void testDeleteCompanyByIdNotFound() {
-        Long id = 1L;
-        when(companyRepository.findById(id)).thenReturn(Optional.empty());
-
-        NotFoundException thrown = assertThrows(NotFoundException.class, () ->
-                companyService.deleteCompanyById(id)
-        );
-
-        assertEquals(RESOURCE_NOT_FOUND, thrown.getMessage());
-        verify(companyRepository).findById(id);
+    void existsCompanyApiKeyReturnsFalseWhenNotExists() {
+        UUID key = UUID.randomUUID();
+        when(companyRepository.findByCompanyApiKey(key)).thenReturn(Optional.empty());
+        assertFalse(companyService.existsCompanyApiKey(key));
     }
 }

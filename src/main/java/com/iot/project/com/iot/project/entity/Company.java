@@ -23,7 +23,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "company", schema = "public", indexes = @Index(name = "idx_api_key_company", columnList = "api_key", unique = true))
+// @Table(name = "company", schema = "public", indexes = @Index(name = "idx_api_key_company", columnList = "api_key", unique = true))
+@Table(name = "company", indexes = @Index(name = "idx_api_key_company", columnList = "api_key", unique = true))
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
